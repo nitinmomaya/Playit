@@ -1,2 +1,2 @@
 # Playit
-A playlist recommendation by AI
+A playlist recommendation by AI in Youtube Music and Spotify
