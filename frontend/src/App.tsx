@@ -1,10 +1,11 @@
 import './App.css'
+import Router from '../Router'
 
 function App() {
-
+ 
   return (
     <>
-      <h1>Welcome to Playit</h1>
+      <Router />
     </>
   )
 }
