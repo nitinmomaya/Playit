@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from login.service import callback, spotify_login
 
-router = APIRouter(prefix="/login", tags=["Login"])
+router = APIRouter(tags=["Login"])
 
 
-@router.get("/")
+@router.get("/login")
 def login() -> RedirectResponse:
     return spotify_login()
 

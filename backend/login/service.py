@@ -1,3 +1,4 @@
+import json
 import random
 import hmac
 import os
@@ -5,8 +6,11 @@ import secrets
 from urllib.parse import urlencode, urlparse
 
 import httpx
+from dotenv import load_dotenv
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
+
+load_dotenv()
 
 SPOTIFY_AUTHORIZE_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
@@ -51,7 +55,7 @@ def spotify_login() -> RedirectResponse:
         httponly=True,
         secure=urlparse(redirect_uri).scheme == "https",
         samesite="lax",
-        path="/login",
+        path="/",
     )
     return response
 
@@ -105,6 +109,17 @@ async def callback(
     except httpx.RequestError as exc:
         raise HTTPException(status_code=502, detail="Could not connect to Spotify.") from exc
 
-    response = JSONResponse(content=profile_response.json())
-    response.delete_cookie(key=STATE_COOKIE, path="/login")
+    profile_data = profile_response.json()
+    frontend_callback = "http://localhost:5173/auth/callback"
+    payload = {
+        "access_token": token_data.get("access_token"),
+        "refresh_token": token_data.get("refresh_token"),
+        "token_type": token_data.get("token_type"),
+        "expires_in": token_data.get("expires_in"),
+        "scope": token_data.get("scope"),
+        "profile": json.dumps(profile_data),
+    }
+
+    response = RedirectResponse(f"{frontend_callback}?{urlencode(payload)}")
+    response.delete_cookie(key=STATE_COOKIE, path="/")
     return response
