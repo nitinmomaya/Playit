@@ -1,52 +1,45 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { useSpotifyAuthActions } from "../../src/lib/auth";
 
 const AuthCallback = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { setAuth } = useSpotifyAuthActions();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    console.log("win", window.location.search, "params", params);
-    const profile = params.get('profile')
-    const accessToken = params.get('access_token')
-    const refreshToken = params.get('refresh_token')
-    const tokenType = params.get('token_type')
-    const expiresIn = params.get('expires_in')
-    const scope = params.get('scope')
-
-    if (accessToken) {
-      localStorage.setItem('spotify_access_token', accessToken)
-    }
-
-    if (refreshToken) {
-      localStorage.setItem('spotify_refresh_token', refreshToken)
-    }
-
-    if (tokenType) {
-      localStorage.setItem('spotify_token_type', tokenType)
-    }
-
-    if (expiresIn) {
-      localStorage.setItem('spotify_expires_in', expiresIn)
-    }
-
-    if (scope) {
-      localStorage.setItem('spotify_scope', scope)
-    }
-
-    if (profile) {
+    const params = new URLSearchParams(window.location.search);
+    const profileRaw = params.get("profile");
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+    const tokenType = params.get("token_type");
+    const expiresIn = params.get("expires_in");
+    const scope = params.get("scope");
+    let parsedProfile = null;
+    if (profileRaw) {
       try {
-        const parsedProfile = JSON.parse(profile)
-        localStorage.setItem('spotify_user', JSON.stringify(parsedProfile))
+        parsedProfile = JSON.parse(profileRaw);
       } catch {
-        localStorage.setItem('spotify_user', profile)
+        parsedProfile = { raw: profileRaw };
       }
     }
 
-    navigate('/', { replace: true })
-  }, [navigate])
+    if (accessToken && refreshToken && tokenType && expiresIn && scope) {
+      console.log("accessToken", accessToken);
+      setAuth({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: tokenType,
+        expires_in: expiresIn,
+        scope,
+        profile: parsedProfile,
+      });
+    }
 
-  return <p>Signing you in...</p>
-}
+    navigate("/", { replace: true });
+  }, [navigate, setAuth]);
 
-export default AuthCallback
+  return <p>Signing you in...</p>;
+};
+
+export default AuthCallback;

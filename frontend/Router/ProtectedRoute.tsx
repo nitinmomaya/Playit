@@ -1,9 +1,12 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
+import { useSpotifyAuth } from '../src/lib/auth'
+
 const ProtectedRoute = () => {
   const location = useLocation()
-  const isAuthenticated = typeof window !== 'undefined'
-    && !!localStorage.getItem('spotify_access_token')
+  const { data } = useSpotifyAuth()
+  console.log('ProtectedRoute data:', data) // Debugging line
+  const isAuthenticated = !!data?.access_token
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />
