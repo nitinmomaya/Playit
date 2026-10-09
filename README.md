@@ -30,7 +30,8 @@ From the project root, create and activate a virtual environment, then install t
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install "fastapi[standard]"
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 Start the API server (keep the virtual environment activated):
