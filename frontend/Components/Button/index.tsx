@@ -1,8 +1,9 @@
 
 import './index.css'
-const Button = ({ name, onClickFunction }: { name: string, onClickFunction: () => void }) => {
+const Button = ({ name, onClickFunction, isSecondaryButton }: { name: string, onClickFunction: () => void, isSecondaryButton?: boolean }) => {
+
   return (
-    <button className="button-primary" onClick={onClickFunction}>
+    <button className={isSecondaryButton ? "button-secondary" : "button-primary"} onClick={onClickFunction}>
       {name}
     </button>
   )

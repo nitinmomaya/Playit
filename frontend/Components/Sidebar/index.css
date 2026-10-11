@@ -1,0 +1,16 @@
+.sidebar-container{
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap:8px;
+    margin: 10px 0px;
+    border-right: 1px solid #ccc;
+    height: 100vh;
+}
+
+.chat-history-item{
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    color: #101010
+}

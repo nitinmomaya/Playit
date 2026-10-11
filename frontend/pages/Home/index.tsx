@@ -1,4 +1,5 @@
 import Navbar from '../../Components/Navbar'
+import Sidebar from '../../Components/Sidebar'
 import { useSpotifyAuth } from '../../src/lib/auth'
 import './index.css'
 
@@ -9,6 +10,7 @@ const Home = () => {
   return (
     <>
       <Navbar />
+      <Sidebar />
       {spotifyUser && (
         <>
          <div className="container">
