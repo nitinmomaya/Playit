@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 export type SpotifyProfile = Record<string, unknown>
 
@@ -57,17 +58,17 @@ export const useSpotifyAuth = () => {
 export const useSpotifyAuthActions = () => {
   const queryClient = useQueryClient()
 
-  const setAuth = (authState: Partial<SpotifyAuthState>) => {
+  const setAuth = useCallback((authState: Partial<SpotifyAuthState>) => {
     const nextState = saveSpotifyAuthState(authState)
     queryClient.setQueryData(SPOTIFY_AUTH_QUERY_KEY, nextState)
     return nextState
-  }
+  }, [queryClient])
 
-  const clearAuth = () => {
+  const clearAuth = useCallback(() => {
     const nextState = clearSpotifyAuthState()
     queryClient.setQueryData(SPOTIFY_AUTH_QUERY_KEY, nextState)
     return nextState
-  }
+  }, [queryClient])
 
   return { setAuth, clearAuth }
 }

@@ -1,9 +1,9 @@
-import React from 'react'
+import { spotifyApi } from '../../src/lib/spotifyApi'
 
 const Login = () => {
 
     const handleSpotifyLogin=()=>{
-        window.location.href='http://127.0.0.1:8000/login'
+        window.location.href = `${spotifyApi.defaults.baseURL}/login`
     }
   return (
    <>

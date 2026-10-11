@@ -1,5 +1,3 @@
-import React from 'react'
-
 import Navbar from '../../Components/Navbar'
 import { useSpotifyAuth } from '../../src/lib/auth'
 
