@@ -1,11 +1,13 @@
 .sidebar-container{
     width: 200px;
+    flex: 0 0 200px;
+    min-height: 0;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap:8px;
-    margin: 10px 0px;
+    padding: 10px;
     border-right: 1px solid #ccc;
-    height: 100vh;
 }
 
 .chat-history-item{

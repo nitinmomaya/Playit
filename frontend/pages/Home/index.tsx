@@ -8,19 +8,20 @@ const Home = () => {
   const spotifyUser = authData?.profile
 
   return (
-    <>
+    <div className="home-layout">
       <Navbar />
-      <Sidebar />
-      {spotifyUser && (
-        <>
-         <div className="container">
-          <div className="header">
-            <p className="welcome-text">Welcome {String(spotifyUser.display_name ?? 'Spotify User')}</p>
-          </div>
-         </div>
-        </>
-      )}
-    </>
+      <div className="home-body">
+        <Sidebar />
+        <main className="content-container">
+          {spotifyUser && (
+            <div className="header">
+              <p className="welcome-text">Welcome {String(spotifyUser.display_name ?? 'Spotify User')}</p>
+              
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
   )
 }
 

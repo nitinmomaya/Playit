@@ -1,3 +1,30 @@
+.home-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.home-layout > .navbar {
+    flex-shrink: 0;
+}
+
+.home-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+}
+
+.content-container {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    padding: 1.5rem;
+}
+
 .welcome-text{
 
     text-align: center;
