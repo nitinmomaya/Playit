@@ -1,5 +1,6 @@
 import Navbar from '../../Components/Navbar'
 import { useSpotifyAuth } from '../../src/lib/auth'
+import './index.css'
 
 const Home = () => {
   const { data: authData } = useSpotifyAuth()
@@ -7,15 +8,16 @@ const Home = () => {
 
   return (
     <>
-      <h1>Home</h1>
+      <Navbar />
       {spotifyUser && (
         <>
-          <p>Welcome {String(spotifyUser.display_name ?? 'Spotify User')}</p>
-          <p>Email: {String(spotifyUser.email ?? 'Not available')}</p>
-          <p>Country: {String(spotifyUser.country ?? 'Not available')}</p>
+         <div className="container">
+          <div className="header">
+            <p className="welcome-text">Welcome {String(spotifyUser.display_name ?? 'Spotify User')}</p>
+          </div>
+         </div>
         </>
       )}
-      <Navbar />
     </>
   )
 }

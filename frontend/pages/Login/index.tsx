@@ -1,5 +1,6 @@
+import Button from '../../Components/Button'
 import { spotifyApi } from '../../src/lib/spotifyApi'
-
+import './index.css'
 const Login = () => {
 
     const handleSpotifyLogin=()=>{
@@ -7,8 +8,16 @@ const Login = () => {
     }
   return (
    <>
-   <h1>Login</h1>
-   <button onClick={handleSpotifyLogin}>Login with Spotify</button>
+   <div className="container">
+    <div className="box">
+   <div className="head-content">
+     <h1>Welcome Back!</h1>
+    <p>Please login with your Spotify account to continue.</p>
+   </div>
+    
+    <Button onClickFunction={handleSpotifyLogin} name="Login with Spotify"/>
+   </div>
+   </div>
    </>
   )
 }

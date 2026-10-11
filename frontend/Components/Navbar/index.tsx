@@ -1,5 +1,7 @@
 import { useSpotifyAuthActions } from '../../src/lib/auth'
-import { getSpotifyUser, spotifyApi } from '../../src/lib/spotifyApi'
+import { getSpotifyUser } from '../../src/lib/spotifyApi'
+import './index.css'
+import Button from '../Button'
 
 const Navbar = () => {
   const { clearAuth } = useSpotifyAuthActions()
@@ -17,10 +19,10 @@ const Navbar = () => {
 
   return (
     <>
-      <div>Navbar</div>
-      <div>Get User Details</div>
-      <button onClick={getUserDetails}> Get User Details</button>
-      <button onClick={logout}>Logout</button>
+     <div className="navbar">
+        <div>Playit</div>
+      <Button name="Logout" onClickFunction={logout} />
+     </div>
     </>
   )
 }
