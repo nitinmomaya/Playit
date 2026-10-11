@@ -1,19 +1,29 @@
 .container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(1rem, 4vw, 3rem);
+  color: #17251e;
+  background: radial-gradient(ellipse at top, #e7f7ec, #f8faf9 70%);
 }
 .box{
 
-    width: 400px;
-    height: 400px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  width: 100%;
+  max-width: 520px;
+  height: 100%;
+  max-height: 520px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+  border: 1px solid #dce9e0;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 48px #143b2410;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 
 .head-content{

@@ -1,0 +1,105 @@
+.error-boundary {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: clamp(1rem, 4vw, 3rem);
+  color: #17251e;
+  background: radial-gradient(ellipse at top, #e7f7ec, #f8faf9 70%);
+}
+
+.error-boundary--full-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.error-boundary__card {
+  width: 100%;
+  max-width: 520px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+  border: 1px solid #dce9e0;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 48px #143b2410;
+}
+
+.error-boundary__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 1.5rem;
+  border-radius: 50%;
+  background: #e8f7ed;
+  color: #167c3d;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.error-boundary__eyebrow {
+  margin-bottom: 0.75rem;
+  color: #167c3d;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.error-boundary h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+}
+
+.error-boundary__description {
+  margin-top: 1rem;
+  color: #59675f;
+  line-height: 1.7;
+}
+
+.error-boundary__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.error-boundary__actions button {
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #d6e2da;
+  border-radius: 10px;
+  background: #fff;
+  color: #17251e;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error-boundary__actions .error-boundary__retry {
+  border-color: #167c3d;
+  background: #167c3d;
+  color: #fff;
+}
+
+.error-boundary__actions button:hover {
+  filter: brightness(0.95);
+}
+
+.error-boundary button:focus-visible,
+.error-boundary a:focus-visible {
+  outline: 3px solid #1db954;
+  outline-offset: 4px;
+}
+
+.error-boundary__note {
+  margin-top: 1rem;
+  color: #59675f;
+  font-size: 0.8rem;
+}
+
+.error-boundary__link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: #167c3d;
+  text-underline-offset: 4px;
+}

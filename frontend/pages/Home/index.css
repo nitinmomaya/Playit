@@ -4,6 +4,7 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
+    font: inherit;
 }
 
 .home-layout > .navbar {
@@ -15,6 +16,7 @@
     flex: 1;
     min-height: 0;
     min-width: 0;
+    font: inherit;
 }
 
 .content-container {
@@ -23,6 +25,7 @@
     min-height: 0;
     overflow: auto;
     padding: 1.5rem;
+    font: inherit;
 }
 
 .welcome-text{
