@@ -1,6 +1,5 @@
-import json
-import random
 import hmac
+import json
 import os
 import secrets
 from urllib.parse import urlencode, urlparse
@@ -8,7 +7,7 @@ from urllib.parse import urlencode, urlparse
 import httpx
 from dotenv import load_dotenv
 from fastapi import HTTPException, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 
 load_dotenv()
 
@@ -65,7 +64,7 @@ async def callback(
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
-) -> JSONResponse:
+) -> RedirectResponse:
     if error:
         raise HTTPException(status_code=400, detail=f"Spotify authorization failed: {error}")
     if not code:

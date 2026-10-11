@@ -6,8 +6,8 @@ const Navbar = () => {
   const { clearAuth } = useSpotifyAuthActions()
 
   const logout = () => {
-    clearAuth()
-    window.location.href = '/login'
+      clearAuth()
+      window.location.href = '/login'
   }
 
   return (
