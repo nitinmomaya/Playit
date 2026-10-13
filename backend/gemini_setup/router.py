@@ -1,19 +1,26 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 import httpx
 from google.genai.errors import APIError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from gemini_setup.service import (
     GeminiConfigurationError,
     GeminiRequestError,
     create_interaction,
+    create_stream_response,
 )
 
 router = APIRouter(prefix="/gemini", tags=["Gemini"])
 
 
 class InteractionRequest(BaseModel):
-    prompt: str
+    prompt: str = Field(min_length=1, max_length=10_000)
+
+
+@router.post("/interactions/stream")
+async def run_stream(request: InteractionRequest) -> StreamingResponse:
+    return create_stream_response(request.prompt)
 
 
 @router.post("/interactions")

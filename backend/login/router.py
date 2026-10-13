@@ -6,7 +6,7 @@ from login.service import callback, spotify_login
 router = APIRouter(tags=["Login"])
 
 
-@router.get("/login")
+@router.get("/spotify/login")
 def login() -> RedirectResponse:
     return spotify_login()
 

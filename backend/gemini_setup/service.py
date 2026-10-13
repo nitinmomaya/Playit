@@ -1,9 +1,13 @@
 """Reusable helpers for calling the Gemini Interactions API."""
 
+import json
 import logging
 import os
+from collections.abc import AsyncIterator
 
 from dotenv import load_dotenv
+from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
 from google import genai
 from google.genai import types
 
@@ -25,6 +29,63 @@ class GeminiConfigurationError(RuntimeError):
 
 class GeminiRequestError(RuntimeError):
     """Raised when all configured Gemini models fail to return output."""
+
+
+def create_stream_response(prompt: str) -> StreamingResponse:
+    """Validate input and build the streamed HTTP response."""
+    if not prompt.strip():
+        raise HTTPException(status_code=422, detail="A valid prompt is required.")
+
+    return StreamingResponse(
+        stream_events(prompt),
+        media_type="application/x-ndjson",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+async def stream_events(prompt: str) -> AsyncIterator[str]:
+    """Encode model chunks, completion, and failures as NDJSON events."""
+    def encode(event_type: str, text: str = "") -> str:
+        return json.dumps({"type": event_type, "text": text}) + "\n"
+
+    yield encode("status", "Waiting for Gemini…")
+    received_text = False
+    stream = stream_interaction(prompt)
+    try:
+        async for text in stream:
+            received_text = True
+            yield encode("delta", text)
+        if not received_text:
+            raise GeminiRequestError("Gemini returned no answer text.")
+        yield encode("done")
+    except Exception as exc:
+        logger.warning("Gemini stream failed (%s)", type(exc).__name__)
+        yield encode("error", "Could not complete the response. Please try again.")
+    finally:
+        await stream.aclose()
+
+
+async def stream_interaction(prompt: str) -> AsyncIterator[str]:
+    """Yield real Gemini answer chunks as they are generated."""
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise GeminiConfigurationError("Gemini API key is missing.")
+    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=60_000))
+    async with client.aio as async_client:
+        stream = await async_client.models.generate_content_stream(
+            model=os.getenv("GEMINI_PRIMARY_MODEL", "gemini-3.5-flash-lite"), contents=prompt,
+        )
+        
+        try:
+            async for chunk in stream:
+                for candidate in chunk.candidates or []:
+                    if candidate.content:
+                        for part in candidate.content.parts or []:
+                            if part.text and not part.thought:
+                                yield part.text
+                        break
+        finally:
+            await stream.aclose()
 
 
 def create_interaction(prompt: str) -> str:

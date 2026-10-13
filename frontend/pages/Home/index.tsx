@@ -1,6 +1,7 @@
 import Navbar from '../../Components/Navbar'
 import Sidebar from '../../Components/Sidebar'
 import ErrorBoundary from '../../Components/ErrorBoundary'
+import Chat from '../../Components/Chat'
 import { useSpotifyAuth } from '../../src/lib/auth'
 import './index.css'
 
@@ -15,12 +16,7 @@ const Home = () => {
         <Sidebar />
         <main className="content-container">
           <ErrorBoundary>
-          {spotifyUser && (
-            <div className="header">
-              <p className="welcome-text">Welcome {String(spotifyUser.display_name ?? 'Spotify User')}</p>
-              
-            </div>
-          )}
+            <Chat displayName={String(spotifyUser?.display_name ?? 'music lover')} />
           </ErrorBoundary>
         </main>
       </div>

@@ -22,7 +22,7 @@ export type SpotifyPlaylists = {
 }
 
 export const spotifyApi = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
+  baseURL: 'http://127.0.0.1:8000/spotify',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const getSpotifyUser = async () => {
     throw new Error('No Spotify access token available')
   }
 
-  const response = await spotifyApi.get<SpotifyProfile>('/spotify/me', {
+  const response = await spotifyApi.get<SpotifyProfile>('/me', {
     headers: getSpotifyAuthHeaders(),
   })
 
@@ -64,7 +64,7 @@ export const getSpotifyUser = async () => {
 }
 
 export const getSpotifyTokens = async (code: string, state: string) => {
-  const response = await spotifyApi.post<SpotifyTokens>('/spotify/token', {
+  const response = await spotifyApi.post<SpotifyTokens>('/token', {
     grant_type: 'authorization_code',
     code,
     state,
@@ -79,7 +79,7 @@ export const refreshSpotifyToken = async () => {
     throw new Error('No Spotify refresh token available')
   }
 
-  const response = await spotifyApi.post<SpotifyTokens>('/spotify/token', {
+  const response = await spotifyApi.post<SpotifyTokens>('/token', {
     grant_type: 'refresh_token',
     refresh_token,
   })
@@ -95,7 +95,7 @@ export const getSpotifyUserPlaylists = async (userId: string) => {
     throw new Error('A Spotify user ID is required')
   }
   const response = await spotifyApi.get<SpotifyPlaylists>(
-    `/spotify/users/${encodeURIComponent(userId)}/playlists`,
+    `/users/${encodeURIComponent(userId)}/playlists`,
   )
   return response.data
 }
