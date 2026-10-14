@@ -60,3 +60,4 @@ def recommend_songs(request: RecommendationRequest) -> SongRecommendations:
             status_code=502,
             detail=f"Could not get recommendations from Gemini: {exc}",
         ) from exc
+

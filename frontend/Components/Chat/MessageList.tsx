@@ -34,6 +34,12 @@ const MessageList = ({ messages }: { messages: ChatMessage[] }) => {
           {message.role === 'assistant' && message.status === 'streaming' && !message.text && (
             <p className="chat-first-token" role="status">
               <span className="chat-pulse" aria-hidden="true" />
+              Connecting to Gemini and waiting for the first token…
+            </p>
+          )}
+          {message.role === 'assistant' && message.status === 'streaming' && !message.text && (
+            <p className="chat-first-token" role="status">
+              <span className="chat-pulse" aria-hidden="true" />
               Gemini is preparing your response…
             </p>
           )}

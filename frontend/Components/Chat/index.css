@@ -187,6 +187,20 @@
     margin-right: 0;
 }
 
+.chat-first-token {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #647269;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.chat-first-token .chat-pulse {
+    flex: 0 0 8px;
+    margin-right: 0;
+}
+
 .chat-progress {
     font-size: 0.8rem;
     color: #647269;

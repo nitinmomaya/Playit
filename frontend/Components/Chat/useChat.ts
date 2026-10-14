@@ -3,6 +3,16 @@ import { streamChatResponse } from '../../src/lib/chatApi'
 import type { ChatMessage } from './types'
 
 // Block 2: request lifecycle, incremental updates, cancellation, and API errors.
+function waitForPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    if (document.visibilityState === 'visible') {
+      requestAnimationFrame(() => resolve())
+    } else {
+      window.setTimeout(resolve, 16)
+    }
+  })
+}
+
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isSending, setIsSending] = useState(false)
@@ -34,6 +44,9 @@ export function useChat() {
         update((message) => event.type === 'delta'
           ? { ...message, text: message.text + event.text }
           : { ...message, progress: [...message.progress, event.text] })
+        // A single network read can contain many already-buffered records.
+        // Let the browser paint each appended delta before consuming the next.
+        if (event.type === 'delta') await waitForPaint()
       }
       update((message) => ({ ...message, status: request.signal.aborted ? 'stopped' : 'complete' }))
     } catch {
