@@ -1,9 +1,13 @@
 from fastapi import APIRouter, HTTPException
+from fastapi import Depends
 from fastapi.responses import StreamingResponse
 import httpx
 from google.genai.errors import APIError
 import json
+from typing import Annotated
 from gemini_setup.conversation import ConversationRequest
+from gemini_setup.agent import run_agent
+from spotify.router import access_token
 
 from gemini_setup.service import (
     GeminiConfigurationError,
@@ -16,6 +20,25 @@ router = APIRouter(prefix="/gemini", tags=["Gemini"])
 
 
 InteractionRequest = ConversationRequest
+
+
+@router.post("/agent")
+async def run_agent_interaction(
+    request: InteractionRequest,
+    token: Annotated[str, Depends(access_token)],
+) -> dict[str, str | None]:
+    """Run Gemini's bounded tool-calling workflow for the authenticated user."""
+    try:
+        print("Running agent interaction with request:", request)
+        return await run_agent(request, token)
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail="Gemini did not respond before the request timed out.") from exc
+    except APIError as exc:
+        raise HTTPException(status_code=502, detail="Gemini could not complete the agent request.") from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Could not complete the agent request.") from exc
 
 
 @router.post("/intent")

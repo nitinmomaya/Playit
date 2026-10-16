@@ -30,12 +30,39 @@
     overflow-wrap: anywhere;
 }
 
-.chat-mode {
+.chat-mode-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: #e8f7ed;
-    color: #167c3d;
-    padding: 0.5rem 0.75rem;
-    border-radius: 30px;
     font-size: 0.75rem;
+    padding: 0.25rem;
+    border-radius: 30px;
+}
+
+.chat-mode-label {
+    color: #52645a;
+    padding: 0 0.5rem;
+}
+
+.chat-mode-picker button {
+    border: 0;
+    border-radius: 20px;
+    padding: 0.45rem 0.75rem;
+    background: transparent;
+    color: #52645a;
+    font: inherit;
+    cursor: pointer;
+}
+
+.chat-mode-picker button.is-selected {
+    background: #167c3d;
+    color: #fff;
+}
+
+.chat-mode-picker button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .chat-messages {

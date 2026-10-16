@@ -51,6 +51,15 @@ export async function preparePlaylist(prompt: string, signal: AbortSignal, histo
   }
 }
 
+export async function runPlaylistAgent(prompt: string, signal: AbortSignal, history: ConversationTurn[] = []) {
+  const agentBaseUrl = new URL('gemini/', config.baseURL).href
+  const { data } = await spotifyApi.post<{ text: string; draft_id: string | null; context_text: string | null }>(
+    'agent', { prompt, history }, { baseURL: agentBaseUrl, signal },
+  )
+  const preview = data.draft_id ? await getPlaylistPreview(data.draft_id) : null
+  return { text: data.text, contextText: data.context_text, preview }
+}
+
 export async function approveAndCreatePlaylist(draftId: string) {
   await spotifyApi.post(`${path(draftId)}/approve`, null, config)
   const { data } = await spotifyApi.post<PlaylistResult>(`${path(draftId)}/create`, null, config)

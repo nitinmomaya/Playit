@@ -6,7 +6,7 @@ import './index.css'
 
 // Block 6: compose the UI; this component owns no transport logic.
 const Chat = ({ displayName }: { displayName: string }) => {
-  const { messages, isSending, error, send, createPlaylist, stop } = useChat()
+  const { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } = useChat()
 
   return (
     <section className="chat" aria-label="Playit music assistant">
@@ -15,7 +15,17 @@ const Chat = ({ displayName }: { displayName: string }) => {
           <p className="chat-eyebrow">YOUR MUSIC COMPANION</p>
           <h1>Welcome, {displayName}</h1>
         </div>
-        <span className="chat-mode">{'API · streaming'}</span>
+        <div className="chat-mode-picker" role="group" aria-label="Chat mode">
+          <span className="chat-mode-label">Mode</span>
+          <button type="button" className={mode === 'agent' ? 'is-selected' : ''}
+            aria-pressed={mode === 'agent'} disabled={isSending} onClick={() => selectMode('agent')}>
+            Agent
+          </button>
+          <button type="button" className={mode === 'rest' ? 'is-selected' : ''}
+            aria-pressed={mode === 'rest'} disabled={isSending} onClick={() => selectMode('rest')}>
+            REST API
+          </button>
+        </div>
       </header>
       <MessageList messages={messages} onCreatePlaylist={createPlaylist} />
       <p className="chat-sr-only" role="status">
