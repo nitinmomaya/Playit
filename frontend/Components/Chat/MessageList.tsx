@@ -5,7 +5,10 @@ import ThinkingIndicator from './ThinkingIndicator'
 import type { ChatMessage } from './types'
 
 // Block 4: render assistant Markdown safely; raw HTML is not enabled.
-const MessageList = ({ messages }: { messages: ChatMessage[] }) => {
+const MessageList = ({ messages, onCreatePlaylist }: {
+  messages: ChatMessage[]
+  onCreatePlaylist: (messageId: string) => Promise<void>
+}) => {
   const list = useRef<HTMLDivElement>(null)
   const followLatest = useRef(true)
 
@@ -37,12 +40,6 @@ const MessageList = ({ messages }: { messages: ChatMessage[] }) => {
               Connecting to Gemini and waiting for the first token…
             </p>
           )}
-          {message.role === 'assistant' && message.status === 'streaming' && !message.text && (
-            <p className="chat-first-token" role="status">
-              <span className="chat-pulse" aria-hidden="true" />
-              Gemini is preparing your response…
-            </p>
-          )}
           {message.text && (message.role === 'assistant' ? (
             <div className="chat-markdown">
               <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml
@@ -57,6 +54,39 @@ const MessageList = ({ messages }: { messages: ChatMessage[] }) => {
               </ReactMarkdown>
             </div>
           ) : <p className="chat-message-text">{message.text}</p>)}
+          {message.playlist && (
+            <div className="chat-playlist-preview">
+              <h3>{message.playlist.preview.proposal.name}</h3>
+              <p>{message.playlist.preview.proposal.description}</p>
+              <p>{message.playlist.preview.proposal.public ? 'Public' : 'Private'} · {message.playlist.preview.matched_count} unique tracks matched</p>
+              {message.playlist.preview.total_duration_ms > 0 && <p>
+                Listening time: {Math.floor(message.playlist.preview.total_duration_ms / 60000)} min {Math.round(message.playlist.preview.total_duration_ms % 60000 / 1000)} sec
+              </p>}
+              {message.playlist.preview.constraint_warning && <p className="chat-error" role="alert">{message.playlist.preview.constraint_warning}</p>}
+              <ul>{message.playlist.preview.matches.map((match, index) => (
+                <li key={index}>
+                  <strong>{match.track?.title ?? match.recommendation.title}</strong>
+                  {' — '}{match.track?.artists.join(', ') ?? match.recommendation.artist}
+                  <span className="chat-message-note"> · {match.status.replaceAll('_', ' ')}</span>
+                </li>
+              ))}</ul>
+              <p className="chat-message-note">The first best match is selected. Unmatched and duplicate suggestions are skipped.</p>
+              {message.playlist.error && <p className="chat-error" role="alert">{message.playlist.error}</p>}
+              {message.playlist.result ? (
+                <p role="status">
+                  {message.playlist.result.status === 'complete'
+                    ? `Playlist created with ${message.playlist.result.added} ${message.playlist.result.added === 1 ? 'track' : 'tracks'}. `
+                    : `Creation needs review (${message.playlist.result.added}/${message.playlist.result.total} confirmed). Check Spotify before making another playlist. `}
+                  {message.playlist.result.url && <a href={message.playlist.result.url} target="_blank" rel="noopener noreferrer">Open in Spotify</a>}
+                </p>
+              ) : (
+                <button type="button" disabled={message.playlist.creating || !message.playlist.preview.matched_count || !!message.playlist.preview.constraint_warning}
+                  onClick={() => void onCreatePlaylist(message.id)}>
+                  {message.playlist.creating ? 'Creating playlist…' : 'Approve and create on Spotify'}
+                </button>
+              )}
+            </div>
+          )}
           {message.status === 'stopped' && <p className="chat-message-note">Response stopped.</p>}
           {message.status === 'error' && <p className="chat-message-note">Response unavailable.</p>}
         </article>

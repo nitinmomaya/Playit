@@ -16,7 +16,7 @@ const ChatComposer = ({ isSending, onSend, onStop }: Props) => {
       <label htmlFor="chat-prompt" className="chat-input-label">Message Playit</label>
       <div className="chat-input-row">
         <textarea id="chat-prompt" value={input} rows={2} maxLength={4000}
-          placeholder="e.g. Recommend mellow indie songs for a rainy evening…"
+          placeholder="Ask for songs, describe a playlist, or refine your last mix…"
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
@@ -27,10 +27,14 @@ const ChatComposer = ({ isSending, onSend, onStop }: Props) => {
         {isSending ? (
           <button type="button" onClick={onStop}>Stop</button>
         ) : (
-          <button type="submit" disabled={!input.trim()}>Send <span aria-hidden="true">↑</span></button>
+          <button type="submit" disabled={!input.trim()}>
+            Send <span aria-hidden="true">↑</span>
+          </button>
         )}
       </div>
-      <p className="chat-composer-hint">Enter to send · Shift + Enter for a new line</p>
+      <p className="chat-composer-hint">
+        Enter to send · Shift + Enter for a new line · Playlists are previewed before creation
+      </p>
     </form>
   )
 }
