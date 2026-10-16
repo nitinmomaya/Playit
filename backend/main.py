@@ -1,11 +1,22 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from gemini_setup.router import router as gemini_router
 from login.router import router as login_router
 from spotify.router import router as spotify_router
+from music.router import router as music_router
+from music.mcp_server import mcp, mcp_app
 
-app = FastAPI(title="Playit API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with mcp.session_manager.run():
+        yield
+
+
+app = FastAPI(title="Playit API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,3 +41,5 @@ def health() -> dict[str, str]:
 app.include_router(spotify_router)
 app.include_router(login_router)
 app.include_router(gemini_router)
+app.include_router(music_router)
+app.mount("/mcp", mcp_app)
