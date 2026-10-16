@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 import httpx
 from google.genai.errors import APIError
-from pydantic import BaseModel, Field
+import json
+from gemini_setup.conversation import ConversationRequest
 
 from gemini_setup.service import (
     GeminiConfigurationError,
@@ -14,19 +15,44 @@ from gemini_setup.service import (
 router = APIRouter(prefix="/gemini", tags=["Gemini"])
 
 
-class InteractionRequest(BaseModel):
-    prompt: str = Field(min_length=1, max_length=10_000)
+InteractionRequest = ConversationRequest
+
+
+@router.post("/intent")
+def classify_intent(request: InteractionRequest) -> dict[str, str]:
+    """Plan a conversational action; never authorize a Spotify write."""
+    instruction = (
+        "Classify the current music conversation request. Return ONLY JSON "
+        '{"action":"playlist"} or {"action":"chat"}. '
+        "Use playlist for requests to recommend/find songs, make/build a playlist or mix, "
+        "or refine an earlier recommendation (such as 'more upbeat', 'only Hindi', "
+        "'make that a playlist', 'add more songs like those', 'I asked for 10', "
+        "'make it 2 hours', 'you only gave me 3 songs'). Use chat for greetings, "
+        "music questions/explanations, questions about a playlist, cancellations, or unrelated conversation. "
+        "A mention of Spotify or the word playlist alone is not enough. "
+        "Do not interpret approval/confirmation as permission to write; approval happens in the UI. "
+        f"Current user message: {request.prompt}"
+    )
+    try:
+        result = json.loads(create_interaction(instruction, request.history))
+        if not isinstance(result, dict) or result.get("action") not in ("playlist", "chat"):
+            raise ValueError("Invalid intent response")
+        return {"action": result["action"]}
+    except GeminiConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Could not understand the request. Please try again.") from exc
 
 
 @router.post("/interactions/stream")
 async def run_stream(request: InteractionRequest) -> StreamingResponse:
-    return create_stream_response(request.prompt)
+    return create_stream_response(request.prompt, request.history)
 
 
 @router.post("/interactions")
 def run_interaction(request: InteractionRequest) -> dict[str, str]:
     try:
-        return {"output": create_interaction(request.prompt)}
+        return {"output": create_interaction(request.prompt, request.history)}
     except GeminiConfigurationError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except httpx.TimeoutException as exc:

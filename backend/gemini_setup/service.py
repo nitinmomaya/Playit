@@ -10,6 +10,7 @@ from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from google import genai
 from google.genai import types
+from gemini_setup.conversation import ConversationTurn, contextual_prompt
 
 load_dotenv()
 
@@ -31,26 +32,26 @@ class GeminiRequestError(RuntimeError):
     """Raised when all configured Gemini models fail to return output."""
 
 
-def create_stream_response(prompt: str) -> StreamingResponse:
+def create_stream_response(prompt: str, history: list[ConversationTurn] | None = None) -> StreamingResponse:
     """Validate input and build the streamed HTTP response."""
     if not prompt.strip():
         raise HTTPException(status_code=422, detail="A valid prompt is required.")
 
     return StreamingResponse(
-        stream_events(prompt),
+        stream_events(prompt, history),
         media_type="application/x-ndjson",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
-async def stream_events(prompt: str) -> AsyncIterator[str]:
+async def stream_events(prompt: str, history: list[ConversationTurn] | None = None) -> AsyncIterator[str]:
     """Encode model chunks, completion, and failures as NDJSON events."""
     def encode(event_type: str, text: str = "") -> str:
         return json.dumps({"type": event_type, "text": text}) + "\n"
 
     yield encode("status", "Waiting for Gemini…")
     received_text = False
-    stream = stream_interaction(prompt)
+    stream = stream_interaction(prompt, history)
     try:
         async for text in stream:
             received_text = True
@@ -65,7 +66,7 @@ async def stream_events(prompt: str) -> AsyncIterator[str]:
         await stream.aclose()
 
 
-async def stream_interaction(prompt: str) -> AsyncIterator[str]:
+async def stream_interaction(prompt: str, history: list[ConversationTurn] | None = None) -> AsyncIterator[str]:
     """Yield real Gemini answer chunks as they are generated."""
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -73,7 +74,11 @@ async def stream_interaction(prompt: str) -> AsyncIterator[str]:
     client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=60_000))
     async with client.aio as async_client:
         stream = await async_client.models.generate_content_stream(
-            model=os.getenv("GEMINI_PRIMARY_MODEL", "gemini-3.5-flash-lite"), contents=prompt,
+            model=os.getenv("GEMINI_PRIMARY_MODEL", "gemini-3.5-flash-lite"),
+            contents=[types.Content(
+                role="model" if turn.role == "assistant" else "user",
+                parts=[types.Part.from_text(text=turn.text)],
+            ) for turn in history or []] + [types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
         )
         
         try:
@@ -88,7 +93,7 @@ async def stream_interaction(prompt: str) -> AsyncIterator[str]:
             await stream.aclose()
 
 
-def create_interaction(prompt: str) -> str:
+def create_interaction(prompt: str, history: list[ConversationTurn] | None = None) -> str:
     """Try the primary model and fallbacks, allowing 10 seconds per attempt."""
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -125,7 +130,7 @@ def create_interaction(prompt: str) -> str:
             print(f"Trying Gemini model: {model}", flush=True)
             interaction = client.interactions.create(
                 model=model,
-                input=prompt,
+                input=contextual_prompt(prompt, history),
                 timeout=10_000,
             )
             output = interaction.output_text

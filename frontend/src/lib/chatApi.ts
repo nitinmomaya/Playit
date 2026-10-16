@@ -1,5 +1,13 @@
 import { createGeminiInteraction, geminiApi } from './geminiApi'
 
+export type ConversationTurn = { role: 'user' | 'assistant'; text: string }
+
+export async function getChatIntent(prompt: string, history: ConversationTurn[], signal: AbortSignal) {
+  const { data } = await geminiApi.post<{ action: 'chat' | 'playlist' }>('/intent', { prompt, history }, { signal })
+  if (data.action !== 'chat' && data.action !== 'playlist') throw new Error('Invalid conversation action.')
+  return data.action
+}
+
 // Block 1: the UI consumes events, independently of the eventual LLM transport.
 export type ChatEvent =
   | { type: 'status'; text: string }
@@ -18,6 +26,7 @@ export async function requestChatResponse(prompt: string, signal: AbortSignal): 
 export async function* streamChatResponse(
   prompt: string,
   signal: AbortSignal,
+  history: ConversationTurn[] = [],
 ): AsyncGenerator<ChatEvent> {
 
   if (!prompt.trim()) throw new Error('A valid prompt is required.')
@@ -25,7 +34,7 @@ export async function* streamChatResponse(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' },
     credentials: 'include',
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, history }),
     signal,
   })
   if (!response.ok || !response.body) {
