@@ -20,12 +20,20 @@
 }
 
 .content-container {
+    display: flex;
+    flex-direction: column;
     flex: 1;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
     padding: 1.5rem;
     font: inherit;
+}
+
+.content-container > .chat {
+    flex: 1;
+    width: 100%;
+    height: auto;
 }
 
 .welcome-text{

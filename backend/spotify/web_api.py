@@ -43,12 +43,12 @@ class TokenRequest(BaseModel):
 
 class CreatePlaylist(BaseModel):
     name: str = Field(..., min_length=1)
-    description: str | None = Field(default=None, min_length=1)
-    public: bool | None = Field(default=None)
+    description: str = Field(default="", max_length=300)
+    public: bool = False
 
 
 class AddItemRequest(BaseModel):
-    uris: list[str] = Field(..., min_items=1)
+    uris: list[str] = Field(..., min_length=1, max_length=100)
     position: int | None = Field(default=None, ge=0)
 
 class UpdateItemRequest(BaseModel):
@@ -146,7 +146,7 @@ async def get_user_playlists(user_id: str, access_token: str) -> dict[str, Any]:
             offset += len(page_items)
     return {"items": items, "total": len(items)}
 
-async def create_playlist(user_id: str,request: CreatePlaylist ):
+async def create_playlist(user_id: str, request: CreatePlaylist, access_token: str) -> dict[str, Any]:
     """Create Playlist for User"""
     #validate request parameters
     if request.name is None or request.description is None or request.public is None:
@@ -158,29 +158,39 @@ async def create_playlist(user_id: str,request: CreatePlaylist ):
     }
     async with httpx.AsyncClient(timeout=15.0, verify=_ssl_context()) as client:
         return await _request_json(
-            client, "POST", f"{SPOTIFY_API_URL}/users/{quote(user_id, safe='')}/playlists",
-            headers={"Authorization": f"Bearer {request.access_token}"},
+            client, "POST", f"{SPOTIFY_API_URL}/me/playlists",
+            headers={"Authorization": f"Bearer {access_token}"},
             json=body,
         )
 
 
-async def add_item_to_playlist(playlist_id: str, request: AddItemRequest) -> dict[str, Any]:
+async def add_item_to_playlist(
+    playlist_id: str, request: AddItemRequest, access_token: str
+) -> dict[str, Any]:
     """Add an item to a playlist."""
 
-    #validate request parameters
-    if request.range_start is None or request.range_before is None or request.range_length is None:
-        raise HTTPException(status_code=400, detail="Invalid request parameters.")
-    body ={
-        "range_start": request.range_start,
-        "range_before": request.range_before,
-        "range_length": request.range_length,
-    }
+    body = request.model_dump(exclude_none=True)
     async with httpx.AsyncClient(timeout=15.0, verify=_ssl_context()) as client:
         return await _request_json(
             client, "POST", f"{SPOTIFY_API_URL}/playlists/{quote(playlist_id, safe='')}/items",
-            headers={"Authorization": f"Bearer {request.access_token}"},
+            headers={"Authorization": f"Bearer {access_token}"},
             json=body,
         )
+
+
+async def search_tracks(query: str, access_token: str) -> list[dict[str, Any]]:
+    """Search with the user's account market; never accept upstream URLs."""
+    async with httpx.AsyncClient(timeout=15.0, verify=_ssl_context()) as client:
+        payload = await _request_json(
+            client, "GET", f"{SPOTIFY_API_URL}/search",
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={"q": query, "type": "track", "limit": 10},
+        )
+    tracks = payload.get("tracks")
+    items = tracks.get("items") if isinstance(tracks, dict) else None
+    if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
+        raise HTTPException(status_code=502, detail="Spotify returned invalid search results.")
+    return items
 
 async def remove_item_from_playlist(playlist_id: str, request: RemoveItemRequest) -> dict[str, Any]:
     """Remove an item from a playlist."""

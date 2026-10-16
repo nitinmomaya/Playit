@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from login.service import STATE_COOKIE, validate_oauth_state
-from spotify.web_api import TokenRequest, get_tokens, get_user, get_user_playlists, create_playlist
+from spotify.web_api import TokenRequest, get_tokens, get_user, get_user_playlists, create_playlist as spotify_create_playlist
 
 router = APIRouter(prefix="/spotify", tags=["Spotify"])
 
@@ -70,11 +70,13 @@ def get_recommendations(request: RecommendationRequest) -> SongRecommendations:
         ) from exc
 
 @router.post("/users/{user_id}/create_playlist")
-async def create_playlist(user_id: str, request: CreatePlaylist) :
+async def create_playlist(
+    user_id: str, request: CreatePlaylist, token: Annotated[str, Depends(access_token)]
+):
     """Create a new playlist based on the recommendation request."""
     try:
         #create playlist based on the songs recommeneded in spotify
-        return await create_playlist(user_id, request)
+        return await spotify_create_playlist(user_id, request, token)
     except HTTPException as exc:
         raise exc
     except Exception as exc:
@@ -84,10 +86,12 @@ async def create_playlist(user_id: str, request: CreatePlaylist) :
         ) from exc
 
 @router.post("/add_item/{playlist_id}/items")
-async def add_item(playlist_id: str, request: AddItemRequest):
+async def add_item(
+    playlist_id: str, request: AddItemRequest, token: Annotated[str, Depends(access_token)]
+):
     """Add an item to a playlist."""
     try:
-        return await add_item_to_playlist(playlist_id, request)
+        return await add_item_to_playlist(playlist_id, request, token)
     except HTTPException as exc:
         raise exc
     except Exception as exc:

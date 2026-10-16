@@ -243,6 +243,48 @@
     border-top: 1px solid #e2e9e4;
 }
 
+.chat-composer-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.chat-playlist-toggle, .chat-playlist-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chat-playlist-toggle input { accent-color: #167c3d; }
+.chat-playlist-name input {
+    min-width: 0;
+    width: min(190px, 40vw);
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #d4e2d8;
+    border-radius: 8px;
+    font: inherit;
+    color: inherit;
+}
+
+.chat-playlist-preview { margin-top: 1rem; line-height: 1.7; }
+.chat-playlist-preview ul { padding-left: 1.25rem; margin: 0.75rem 0; }
+.chat-playlist-preview li + li { margin-top: 0.4rem; }
+.chat-playlist-preview a { color: #167c3d; text-decoration: underline; }
+.chat-playlist-preview button {
+    margin-top: 0.75rem;
+    border: 0;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    background: #167c3d;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+.chat-playlist-preview button:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .chat-input-label {
     display: block;
     font-size: 0.8rem;

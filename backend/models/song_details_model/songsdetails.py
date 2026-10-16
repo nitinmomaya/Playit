@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from music.models import PlaylistMetadata
 
 
 class SongDetails(BaseModel):
@@ -12,6 +13,8 @@ class SongDetails(BaseModel):
 	release_date: str
 
 
-class SongRecommendations(BaseModel):
+class SongRecommendations(PlaylistMetadata):
 	message: str
 	recommendations: list[SongDetails]
+	requested_count: int | None = None
+	target_duration_ms: int | None = None
