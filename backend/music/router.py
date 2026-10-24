@@ -1,14 +1,28 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Response
 
-from music.models import PlaylistPreview, PlaylistProposal, PlaylistResult
+from gemini_setup.conversation import ConversationRequest
+from music.models import PlaylistPreview, PlaylistProposal, PlaylistResult, RecommendationPreview
 from music.service import SESSION_TTL, playlist_service
+from recommendations.langgraph_workflow import prepare_recommendations, recommendation_context
 from spotify.router import access_token
 from spotify.web_api import get_user
 
 router = APIRouter(prefix="/music", tags=["Music playlists"])
 Token = Annotated[str, Depends(access_token)]
+
+
+@router.post("/recommendations", response_model=RecommendationPreview)
+async def recommend(
+    body: ConversationRequest,
+    token: Token,
+    response: Response,
+    provider: Literal["spotify", "youtube"] = "spotify",
+) -> RecommendationPreview:
+    response.headers["Cache-Control"] = "no-store"
+    preview, recommendations = await prepare_recommendations(body, token, provider)
+    return RecommendationPreview(preview=preview, context_text=recommendation_context(recommendations))
 
 
 @router.post("/sessions")

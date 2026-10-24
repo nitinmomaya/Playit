@@ -83,3 +83,8 @@ class PlaylistPreview(BaseModel):
     result: PlaylistResult | None = None
     total_duration_ms: int = 0
     constraint_warning: str | None = None
+
+
+class RecommendationPreview(BaseModel):
+    preview: PlaylistPreview
+    context_text: str

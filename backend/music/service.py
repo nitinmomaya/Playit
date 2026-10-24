@@ -74,15 +74,20 @@ class PlaylistService:
             raise HTTPException(status_code=503, detail="Too many active playlist drafts.")
         provider = self.providers[proposal.provider]
         matches: list[SongMatch] = []
-        seen: set[str] = set()
-        # Sequential requests intentionally bound upstream concurrency and propagate 429.
         for song in proposal.songs:
-            match = await provider.resolve(song, token)
+            matches.append(await provider.resolve(song, token))
+        return self.prepare_resolved(proposal, matches, token)
+
+    @staticmethod
+    def select_matches(proposal: PlaylistProposal, matches: list[SongMatch]) -> list[SongMatch]:
+        """Select verified tracks without mutating the graph's reusable matches."""
+        matches = [match.model_copy(deep=True) for match in matches]
+        seen: set[str] = set()
+        for match in matches:
             if match.track:
                 if match.track.id in seen:
                     match.status = "duplicate"
                 seen.add(match.track.id)
-            matches.append(match)
         if proposal.target_duration_ms:
             # Bounded subset-sum in five-second units; Spotify durations stay
             # server-side. Whole songs cannot generally sum to an exact time.
@@ -102,12 +107,16 @@ class PlaylistService:
             for index, match in enumerate(matches):
                 if match.status == "matched" and index not in selected:
                     match.status = "not_selected"
-        # Recheck after network awaits: concurrent requests must not bypass the cap.
+        return matches
+
+    def prepare_resolved(self, proposal: PlaylistProposal, matches: list[SongMatch], token: str) -> PlaylistPreview:
+        """Store server-verified matches; never exposed as an HTTP or model tool."""
         self.prune()
         if len(self.drafts) >= MAX_ENTRIES:
             raise HTTPException(status_code=503, detail="Too many active playlist drafts.")
         draft_id = secrets.token_urlsafe(24)
-        self.drafts[draft_id] = Draft(self.owner(token), proposal, matches, time.monotonic() + DRAFT_TTL)
+        selected = self.select_matches(proposal, matches)
+        self.drafts[draft_id] = Draft(self.owner(token), proposal, selected, time.monotonic() + DRAFT_TTL)
         return self.preview(draft_id, token)
 
     def preview(self, draft_id: str, token: str) -> PlaylistPreview:

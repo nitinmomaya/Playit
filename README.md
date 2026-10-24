@@ -96,8 +96,61 @@ certificate store, including trusted enterprise CAs on macOS. TLS verification
 remains enabled. Custom CA bundles can also be provided via `SSL_CERT_FILE` or
 `SSL_CERT_DIR`.
 
-Backend tests use mocked Spotify requests and require no Spotify credentials:
-run `python -m unittest discover -s tests -v` from the backend directory.
+## Recommendation workflow
+
+Both chat modes use **LangChain + LangGraph** for playlist recommendations.
+Gemini classifies the request first; playlist requests execute draft preparation
+before reporting success. Preparation failures are returned as errors, not model
+narration. Ordinary chat and text streaming continue using the existing Gemini SDK.
+
+The integration is deliberately separated:
+
+| File | Responsibility |
+| --- | --- |
+| `backend/recommendations/langchain_model.py` | Gemini configuration, recommendation prompt, Pydantic structured output, and distinct-song validation |
+| `backend/recommendations/langgraph_workflow.py` | Graph state and bounded generation, catalog resolution, constraint checking, and draft preparation |
+| `backend/music/service.py` | Deterministic deduplication/duration selection, owner-bound drafts, approval, and playlist writes |
+| `backend/spotify/service.py` | Compatibility wrapper for the existing recommendations-only endpoint |
+
+```mermaid
+flowchart LR
+	A[Generate candidates] --> B[Resolve new candidates]
+	B --> C[Check count and duration]
+	C -->|Shortfall and budget remains| A
+	C -->|Satisfied or budget exhausted| D[Reviewable draft]
+	D --> E[Explicit user approval]
+	E --> F[Existing playlist creation service]
+```
+
+Install the updated backend requirements, then restart the API. No additional
+credentials are needed: use `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) and optionally
+`GEMINI_PRIMARY_MODEL`. The configured model must support structured JSON output.
+The new recommender uses this model only; the legacy SDK fallback-model settings
+still apply to existing SDK interactions, not LangChain recommendation calls.
+
+The graph retains catalog matches and searches only newly generated candidates.
+It allows at most three generation rounds and 200 total candidates per request.
+Each round allows at most three schema/distinctness attempts, with SDK retries
+disabled and a 20-second model timeout. The graph has a 120-second timeout;
+an already-running synchronous model call can take until its timeout to unwind.
+Provider rate limits propagate without automatic search retries. If the budget
+is exhausted, the preview retains its unmet count/duration warning, and explicit
+constraints still block approval. Replacement searches consume provider quota,
+especially YouTube's search quota.
+
+`POST /music/recommendations?provider=spotify` (or `youtube`) accepts
+`{"prompt":"10 happy Hindi songs","history":[]}` and the selected provider's
+bearer token. It returns `{ "preview": ..., "context_text": ... }` without
+creating a playlist. REST mode uses this route; Agent mode calls the same graph
+internally. Existing `/spotify/recommendations` and `/music/drafts` remain
+available separately, but using them separately does not run the repair loop.
+
+Tokens stay in request-local server code, not graph state or model prompts.
+Only original model suggestions enter replacement prompts and conversation
+context; catalog titles, IDs, artists, and durations remain server-side.
+Hosted LangSmith tracing is explicitly disabled for this workflow, and no graph
+checkpoints are persisted. This improves playlist completeness, not a proven
+personalization gain: there is no new preference database or learned ranking.
 
 ## YouTube backend API
 

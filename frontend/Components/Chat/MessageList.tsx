@@ -67,7 +67,7 @@ const MessageList = ({ messages, onCreatePlaylist }: {
                 <li key={index}>
                   <strong>{match.track?.title ?? match.recommendation.title}</strong>
                   {' — '}{match.track?.artists.join(', ') ?? match.recommendation.artist}
-                  {match.track && message.playlist.preview.proposal.provider === 'youtube' && ' (uploader)'}
+                  {match.track && message.playlist?.preview.proposal.provider === 'youtube' && ' (uploader)'}
                   <span className="chat-message-note"> · {match.status.replaceAll('_', ' ')}</span>
                 </li>
               ))}</ul>

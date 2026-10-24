@@ -10,7 +10,8 @@ from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from google import genai
 from google.genai import types
-from gemini_setup.conversation import ConversationTurn, contextual_prompt
+from typing import Literal
+from gemini_setup.conversation import ConversationRequest, ConversationTurn, contextual_prompt
 
 load_dotenv()
 
@@ -30,6 +31,31 @@ class GeminiConfigurationError(RuntimeError):
 
 class GeminiRequestError(RuntimeError):
     """Raised when all configured Gemini models fail to return output."""
+
+
+def classify_request(request: ConversationRequest) -> Literal["playlist", "chat"]:
+    """Choose a workflow, never authorize a provider write."""
+    instruction = (
+        "Classify the current music conversation request. Return ONLY JSON "
+        '{"action":"playlist"} or {"action":"chat"}. '
+        "Use playlist for requests to recommend/find songs, make/build a playlist or mix, "
+        "or refine an earlier recommendation (such as 'more upbeat', 'only Hindi', "
+        "'make that a playlist', 'add more songs like those', 'I asked for 10', "
+        "'make it 2 hours', 'you only gave me 3 songs'). Use chat for greetings, "
+        "music questions/explanations, questions about a playlist, cancellations, or unrelated conversation. "
+        "A mention of Spotify or the word playlist alone is not enough. "
+        "Do not interpret approval/confirmation as permission to write; approval happens in the UI. "
+        f"Current user message: {request.prompt}"
+    )
+    try:
+        result = json.loads(create_interaction(instruction, request.history))
+        if not isinstance(result, dict) or result.get("action") not in ("playlist", "chat"):
+            raise ValueError("Invalid intent response")
+        return "playlist" if result["action"] == "playlist" else "chat"
+    except GeminiConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Could not understand the request. Please try again.") from exc
 
 
 def create_stream_response(prompt: str, history: list[ConversationTurn] | None = None) -> StreamingResponse:

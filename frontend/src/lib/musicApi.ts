@@ -33,27 +33,10 @@ const config = { baseURL: new URL('..', `${spotifyApi.defaults.baseURL}/`).href 
 const path = (draftId: string) => `/music/drafts/${encodeURIComponent(draftId)}`
 
 export async function preparePlaylist(prompt: string, signal: AbortSignal, history: ConversationTurn[] = [], provider: MusicProvider = 'spotify') {
-  const api = clientFor(provider)
-  const { data } = await api.post<{
-    message: string
-    name: string
-    description: string
-    requested_count: number | null
-    target_duration_ms: number | null
-    recommendations: { songname: string; artistname: string }[]
-  }>('/spotify/recommendations', { prompt, history }, { ...config, signal })
-  signal.throwIfAborted()
-  const response = await api.post<PlaylistPreview>('/music/drafts', {
-    provider, name: data.name, description: data.description, public: false, songs: data.recommendations,
-    requested_count: data.requested_count, target_duration_ms: data.target_duration_ms,
-  }, { ...config, signal })
-  return {
-    preview: response.data,
-    // Retain the model's original suggestions separately from Spotify matches.
-    // Only this independently generated text may enter future Gemini context.
-    contextText: JSON.stringify({ message: data.message, name: data.name,
-      description: data.description, recommendations: data.recommendations }),
-  }
+  const { data } = await clientFor(provider).post<{ preview: PlaylistPreview; context_text: string }>(
+    '/music/recommendations', { prompt, history }, { ...config, signal, params: { provider } },
+  )
+  return { preview: data.preview, contextText: data.context_text }
 }
 
 export async function runPlaylistAgent(prompt: string, signal: AbortSignal, history: ConversationTurn[] = [], provider: MusicProvider = 'spotify') {
