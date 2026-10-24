@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders, type RawAxiosRequestHeaders } from 'axios'
 
+import { API_BASE_URL } from './apiConfig'
 import { readSpotifyAuthState, type SpotifyProfile } from './auth'
 
 export type SpotifyTokens = {
@@ -22,7 +23,7 @@ export type SpotifyPlaylists = {
 }
 
 export const spotifyApi = axios.create({
-  baseURL: 'http://127.0.0.1:8000/spotify',
+  baseURL: `${API_BASE_URL}/spotify`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

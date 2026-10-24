@@ -1,4 +1,5 @@
 import axios, { AxiosHeaders } from 'axios'
+import { API_BASE_URL } from './apiConfig'
 import { readYouTubeAuthState, type YouTubeProfile } from './youtubeAuth'
 
 export type YouTubeTokens = {
@@ -20,7 +21,7 @@ export type YouTubePage = {
 }
 
 export const youtubeApi = axios.create({
-  baseURL: 'http://127.0.0.1:8000/youtube',
+  baseURL: `${API_BASE_URL}/youtube`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })

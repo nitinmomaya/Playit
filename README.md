@@ -51,10 +51,30 @@ In a second terminal, from the project root:
 ```sh
 cd frontend
 npm install
-npm run dev
+npm start
 ```
 
 Open the local URL printed by Vite (normally <http://localhost:5173>). `npm install` is only needed the first time or after frontend dependencies change.
+
+### Frontend deployment on Render
+
+Create a Static Site with root directory `frontend`, build command
+`npm ci && npm run build`, and publish directory `dist`. Add this environment
+variable to the frontend Static Site before building:
+
+```dotenv
+VITE_API_BASE_URL=https://playit-backend-0196.onrender.com
+```
+
+Use the backend origin without `/spotify`, `/youtube`, or `/gemini`; the clients
+append their own paths. Without this variable, local development uses
+`http://127.0.0.1:8000`. Vite embeds the URL at build time, so changing it requires
+a new frontend build. Never put secrets in `VITE_` variables.
+
+Add a Render rewrite from `/*` to `/index.html` for browser routes and OAuth
+callback pages. After the frontend URL is assigned, allow that exact origin in
+backend CORS and set the backend `FRONTEND_CALLBACK_URL` and
+`YOUTUBE_FRONTEND_CALLBACK_URL` to the corresponding frontend callback routes.
 
 ## Spotify backend API
 
@@ -66,7 +86,7 @@ in the Spotify dashboard and point to the backend `/callback`.
 
 Optional settings: `FRONTEND_CALLBACK_URL` (default
 `http://localhost:5173/auth/callback`) and `VITE_API_BASE_URL` (default
-`http://localhost:8000`). Use the same backend hostname for login and API requests
+`http://127.0.0.1:8000`). Use the same backend hostname for login and API requests
 so that OAuth state cookies are available. Add production frontend origins to CORS
 before deployment.
 

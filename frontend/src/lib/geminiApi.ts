@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { API_BASE_URL } from './apiConfig'
 
 
 export const geminiApi = axios.create({
-  baseURL: 'http://127.0.0.1:8000/gemini',
+  baseURL: `${API_BASE_URL}/gemini`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
