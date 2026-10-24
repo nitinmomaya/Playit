@@ -27,7 +27,7 @@ const Chat = ({ displayName, provider = 'Spotify' }: { displayName: string; prov
           </button>
         </div>
       </header>
-      {<p>{`${provider} · Review the matched songs, then approve to create your playlist.<`}</p>}
+      {<p>{`${provider} · Review the matched songs, then approve to create your playlist.`}</p>}
       <MessageList messages={messages} onCreatePlaylist={createPlaylist} />
       <p className="chat-sr-only" role="status">
         {isSending ? 'Playit is responding.' : messages.length ? 'Response finished.' : ''}
