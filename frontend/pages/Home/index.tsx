@@ -9,16 +9,16 @@ const Home = () => {
   const { data: authData } = useSpotifyAuth()
   const { data: youtubeAuth } = useYouTubeAuth()
   const spotifyUser = authData?.profile
-  const provider = authData?.access_token ? 'spotify' : 'youtube'
+  const provider = authData?.access_token ? 'Spotify' : 'YouTube'
 
   return (
-    <div className={provider === 'youtube' ? 'home-layout home-layout--youtube' : 'home-layout'}>
+    <div className={provider.toLowerCase() === 'youtube' ? 'home-layout home-layout--youtube' : 'home-layout'}>
       <Navbar />
       <div className="home-body">
         <main className="content-container">
           <ErrorBoundary>
             <Chat provider={provider} displayName={String(
-              provider === 'spotify' ? spotifyUser?.display_name ?? 'music lover'
+              provider.toLocaleLowerCase() === 'spotify' ? spotifyUser?.display_name ?? 'music lover'
                 : youtubeAuth?.profile?.name ?? 'music lover',
             )} />
           </ErrorBoundary>
