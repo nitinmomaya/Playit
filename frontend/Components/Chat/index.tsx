@@ -6,7 +6,8 @@ import './index.css'
 
 // Block 6: compose the UI; this component owns no transport logic.
 const Chat = ({ displayName, provider = 'Spotify' }: { displayName: string; provider?: 'Spotify' | 'YouTube' }) => {
-  const { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } = useChat(provider)
+  const musicProvider = provider === 'YouTube' ? 'youtube' : 'spotify'
+  const { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } = useChat(musicProvider)
 
   return (
     <section className="chat" aria-label="Playit music assistant">
@@ -27,7 +28,7 @@ const Chat = ({ displayName, provider = 'Spotify' }: { displayName: string; prov
           </button>
         </div>
       </header>
-      {<p>{`${provider} · Review the matched songs, then approve to create your playlist.<`}</p>}
+      <p>{provider} · Review the matched songs, then approve to create your playlist.</p>
       <MessageList messages={messages} onCreatePlaylist={createPlaylist} />
       <p className="chat-sr-only" role="status">
         {isSending ? 'Playit is responding.' : messages.length ? 'Response finished.' : ''}
