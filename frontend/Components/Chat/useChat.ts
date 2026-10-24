@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { getChatIntent, streamChatResponse, type ConversationTurn } from '../../src/lib/chatApi'
-import { approveAndCreatePlaylist, getPlaylistPreview, musicErrorMessage, preparePlaylist, runPlaylistAgent, type MusicProvider } from '../../src/lib/musicApi'
+import { approveAndCreatePlaylist, getPlaylistPreview, musicErrorMessage, preparePlaylist, runPlaylistAgent } from '../../src/lib/musicApi'
 import type { ChatMessage } from './types'
 
 export type ChatMode = 'agent' | 'rest'
 const CHAT_MODE_STORAGE_KEY = 'playit-chat-mode'
 
 // Block 2: request lifecycle, cancellation, and API errors.
-export function useChat(provider: MusicProvider = 'spotify') {
+export function useChat(provider: 'Spotify' | 'YouTube' = 'Spotify') {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,7 +86,7 @@ export function useChat(provider: MusicProvider = 'spotify') {
         const action = await getChatIntent(prompt, history, request.signal)
         request.signal.throwIfAborted()
         if (action === 'playlist') {
-          const destination = provider === 'youtube' ? 'YouTube' : 'Spotify'
+          const destination = provider === 'YouTube' ? 'YouTube' : 'Spotify'
           update((message) => ({ ...message, text: `Finding recommendations and matching them on ${destination}…` }))
           const { preview, contextText } = await preparePlaylist(prompt, request.signal, history, provider)
           request.signal.throwIfAborted()
