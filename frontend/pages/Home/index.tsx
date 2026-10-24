@@ -16,7 +16,6 @@ const Home = () => {
     <div className="home-layout">
       <Navbar />
       <div className="home-body">
-        <Sidebar />
         <main className="content-container">
           <ErrorBoundary>
             <Chat provider={provider} displayName={String(
