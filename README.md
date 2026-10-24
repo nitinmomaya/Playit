@@ -2,6 +2,22 @@
 
 Playit is a playlist of songs recommended by AI for YouTube Music and Spotify.
 
+## Code explanations
+
+The `code/explain` branch includes behavior-preserving source comments and four
+detailed walkthroughs. Start with the guide for the layer you are exploring:
+
+- [Frontend: navigation, components, OAuth, chat, and API flows](code_explains/frontend_README.md)
+- [Backend: modules, routes, validation, matching, and playlist safety](code_explains/backend_README.md)
+- [MCP: server, trusted clients, setup, tools, and human approval](code_explains/mcp_README.md)
+- [LangChain and LangGraph: models, schemas, graph state, nodes, and customization](code_explains/langchain_langgraph_README.md)
+
+Code comments sit beside the relevant statements, with JSX-safe comments around
+rendered elements. Each source file ends with a short bullet-point file summary.
+CSS remains free of the added annotations. Strict JSON configuration and generated
+lockfiles are explained in the guides rather than modified with invalid comments.
+Secrets, installed dependencies, and generated build output are not annotated.
+
 ## Tech stack
 
 ### Frontend
@@ -51,7 +67,7 @@ In a second terminal, from the project root:
 ```sh
 cd frontend
 npm install
-npm run dev
+npm start
 ```
 
 Open the local URL printed by Vite (normally <http://localhost:5173>). `npm install` is only needed the first time or after frontend dependencies change.
@@ -59,14 +75,15 @@ Open the local URL printed by Vite (normally <http://localhost:5173>). `npm inst
 ## Spotify backend API
 
 All Spotify HTTP API requests go through the backend. Spotify's authorization
-screen is still opened in the browser via `GET /login` (OAuth requires this).
+screen is still opened in the browser via `GET /spotify/login` (OAuth requires this).
 Keep `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, and `SPOTIFY_REDIRECT_URI`
 in the backend environment. The redirect URI must exactly match the one registered
 in the Spotify dashboard and point to the backend `/callback`.
 
-Optional settings: `FRONTEND_CALLBACK_URL` (default
-`http://localhost:5173/auth/callback`) and `VITE_API_BASE_URL` (default
-`http://localhost:8000`). Use the same backend hostname for login and API requests
+Optional setting: `FRONTEND_CALLBACK_URL` (default
+`http://localhost:5173/auth/callback`). Frontend API URLs are currently hardcoded
+in the Axios modules; `VITE_API_BASE_URL` is not read by those modules.
+Use the same backend hostname for login and API requests
 so that OAuth state cookies are available. Add production frontend origins to CORS
 before deployment.
 

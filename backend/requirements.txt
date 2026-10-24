@@ -1,72 +1,149 @@
+# Agent/environment detection used by the installed command-line tooling stack.
 agent-detector==2.0.0
+# Documentation annotations consumed by framework and tooling dependencies.
 annotated-doc==0.0.5
+# Metadata constraints used by the Pydantic validation ecosystem.
 annotated-types==0.8.0
+# Async concurrency abstraction used by HTTP/ASGI libraries.
 anyio==4.15.1
+# Packaged certificate-authority bundle used by HTTP clients where configured.
 certifi==2026.7.22
+# Foreign-function interface used by native/cryptographic dependencies.
 cffi==2.1.1
+# Character-encoding detection used by the Requests dependency stack.
 charset-normalizer==3.5.2
+# Command-line argument processing used by server/tooling commands.
 click==8.5.0
+# Cryptographic primitives used by authentication/security dependencies.
 cryptography==50.0.2
+# Installer detection for tooling; not playlist recommendation logic.
 detect-installer==0.2.1
+# Operating-system distribution detection for dependency/tooling support.
 distro==1.9.0
+# DNS resolution support used by email-validation dependencies.
 dnspython==2.8.0
+# Validation of email-shaped values in supported Pydantic types.
 email-validator==2.3.0
+# Main HTTP framework exposing routes, validation, and OpenAPI.
 fastapi==0.142.2
+# Optional FastAPI development/production CLI entry points.
 fastapi-cli==0.0.32
+# Installed FastAPI cloud tooling; not an application deployment configuration.
 fastapi-cloud-cli==0.26.0
+# Supporting dependency in the installed FastAPI tooling environment.
 fastar==0.12.0
+# Google authentication support used by Google's API libraries.
 google-auth==2.60.0
+# Native Gemini SDK used by intent, ordinary chat, and text streaming.
 google-genai==2.28.0
+# Shared Google API protocol message definitions.
 googleapis-common-protos==1.75.5
+# Pure-Python HTTP/1.1 protocol implementation used by HTTP libraries.
 h11==0.16.0
+# Low-level connection handling beneath HTTPX.
 httpcore==1.0.9
+# Accelerated HTTP parsing available to Uvicorn.
 httptools==0.8.0
+# Async HTTP client used for provider OAuth, APIs, and MCP bootstrap.
 httpx==0.28.1
+# Internationalized domain-name handling for HTTP dependencies.
 idna==3.20
+# Template engine included by tooling/framework dependencies.
 Jinja2==3.1.6
+# LangChain adapter that produces structured Gemini song candidates.
 langchain-google-genai==4.4.2
+# State-graph engine running bounded candidate generation and catalog repair.
 langgraph==1.2.17
+# LangChain tracing context support; hosted tracing is disabled in this workflow.
 langsmith==0.14.12
+# Markdown parser used by rich/CLI support dependencies.
 markdown-it-py==4.2.0
+# Safe markup primitives used by template-engine dependencies.
 MarkupSafe==3.0.4
+# URL utilities supporting Markdown parsing dependencies.
 mdurl==0.1.2
+# Model Context Protocol SDK providing FastMCP and Streamable HTTP clients.
 mcp==1.30.0
+# Bounded string-similarity scoring for title and romanization matching.
 rapidfuzz>=3.14,<4
+# Telemetry interfaces available to instrumented dependencies.
 opentelemetry-api==1.45.1
+# HTTP transport support for installed telemetry exporters.
 opentelemetry-exporter-http-transport==0.66b1
+# Shared OTLP exporter support code.
 opentelemetry-exporter-otlp-common==0.66b1
+# Shared protobuf helpers for OTLP exporters.
 opentelemetry-exporter-otlp-proto-common==1.45.1
+# OTLP-over-HTTP exporter; installation does not enable tracing by itself.
 opentelemetry-exporter-otlp-proto-http==1.45.1
+# OpenTelemetry protocol message definitions.
 opentelemetry-proto==1.45.1
+# Telemetry SDK implementation available to supporting dependencies.
 opentelemetry-sdk==1.45.1
+# Standard telemetry attribute/semantic definitions.
 opentelemetry-semantic-conventions==0.66b1
+# Protocol Buffers runtime used by Google/telemetry message definitions.
 protobuf==7.36.2
+# ASN.1 primitives used by authentication/cryptographic dependencies.
 pyasn1==0.6.4
+# Standard ASN.1 structures for authentication/cryptographic dependencies.
 pyasn1_modules==0.4.2
+# C parser used by the CFFI dependency stack.
 pycparser==3.0
+# Application request/response validation and structured model schemas.
 pydantic==2.13.5
+# Additional validated types installed with the environment.
 pydantic-extra-types==2.11.1
+# Settings-model support installed with the environment.
 pydantic-settings==2.15.0
+# Native validation core behind Pydantic.
 pydantic_core==2.46.5
+# Syntax highlighting used by rich terminal output.
 Pygments==2.21.0
+# Load ignored local environment files in backend service modules.
 python-dotenv==1.2.4
+# Multipart form parsing support for the ASGI/framework stack.
 python-multipart==0.0.32
+# YAML parsing available to tooling and supporting dependencies.
 PyYAML==6.0.3
+# Synchronous HTTP client used by supporting authentication/tooling libraries.
 requests==2.34.2
+# Rich terminal formatting used by installed CLIs.
 rich==15.0.0
+# Additional rich terminal toolkit for installed command-line tooling.
 rich-toolkit==0.20.5
+# Ignore-pattern support used by installed tooling.
 rignore==0.8.1
+# Error-reporting client available to tooling; no app initialization is implied.
 sentry-sdk==2.71.0
+# Shell detection for installed command-line applications.
 shellingham==1.5.4
+# Async-library detection used by concurrent HTTP dependencies.
 sniffio==1.3.1
+# ASGI request/response, middleware, and application foundations beneath FastAPI.
 starlette==1.7.0
+# Retry utilities used by model/HTTP dependencies; explicit workflow limits still apply.
 tenacity==9.1.4
+# Typed command-line application framework for installed CLI tools.
 typer==0.27.3
+# Use operating-system certificate trust for verified provider HTTPS calls.
 truststore==0.10.4
+# Runtime type-hint inspection used by validation/framework dependencies.
 typing-inspection==0.4.4
+# Compatibility typing constructs used by the dependency stack.
 typing_extensions==4.16.0
+# HTTP connection/pooling support beneath Requests.
 urllib3==2.8.0
+# ASGI server loading backend main:app.
 uvicorn==0.54.0
+# Faster event loop on supported platforms; do not install it on Windows.
 uvloop==0.23.0 ; platform_system != "Windows"
+# File-watching support used by Uvicorn reload and development tooling.
 watchfiles==1.3.0
+# WebSocket protocol support available to the ASGI/model dependency stack.
 websockets==16.1.1
+
+# File summary
+# - Pins the backend framework, provider clients, and supporting dependencies.
+# - Includes MCP, LangChain, LangGraph, and native Gemini SDK integrations.
+# - Install with python -m pip install -r requirements.txt inside the backend venv.

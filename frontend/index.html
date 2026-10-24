@@ -1,12 +1,29 @@
+<!-- Use standards-mode HTML parsing rather than legacy quirks mode. -->
 <!doctype html>
+<!-- Declare the document language for accessibility and browser language tools. -->
 <html lang="en">
+  <!-- Head metadata configures the document rather than rendering application UI. -->
   <head>
+    <!-- Decode source and UI text as UTF-8, including music titles in other scripts. -->
     <meta charset="UTF-8" />
+    <!-- Match the layout viewport to device width without initially zooming the page. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Set the browser-tab title; React renders the visible page headings separately. -->
     <title>Welcome to Playit</title>
+    <!-- Finish document metadata. -->
   </head>
+  <!-- The body contains the React mount point and its JavaScript module entry. -->
   <body>
+    <!-- createRoot in main.tsx renders the application into this initially empty element. -->
     <div id="root"></div>
+    <!-- Vite serves/transforms this ES module during development and bundles it for production. -->
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Finish the document's renderable body. -->
   </body>
+  <!-- Close the complete HTML document. -->
 </html>
+
+<!-- File summary
+  - Defines the document metadata and React root element.
+  - Loads main.tsx as the frontend module entry point.
+-->
