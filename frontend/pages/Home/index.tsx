@@ -3,11 +3,14 @@ import Sidebar from '../../Components/Sidebar'
 import ErrorBoundary from '../../Components/ErrorBoundary'
 import Chat from '../../Components/Chat'
 import { useSpotifyAuth } from '../../src/lib/auth'
+import { useYouTubeAuth } from '../../src/lib/youtubeAuth'
 import './index.css'
 
 const Home = () => {
   const { data: authData } = useSpotifyAuth()
+  const { data: youtubeAuth } = useYouTubeAuth()
   const spotifyUser = authData?.profile
+  const provider = authData?.access_token ? 'spotify' : 'youtube'
 
   return (
     <div className="home-layout">
@@ -16,7 +19,10 @@ const Home = () => {
         <Sidebar />
         <main className="content-container">
           <ErrorBoundary>
-            <Chat displayName={String(spotifyUser?.display_name ?? 'music lover')} />
+            <Chat provider={provider} displayName={String(
+              provider === 'spotify' ? spotifyUser?.display_name ?? 'music lover'
+                : youtubeAuth?.profile?.name ?? 'music lover',
+            )} />
           </ErrorBoundary>
         </main>
       </div>

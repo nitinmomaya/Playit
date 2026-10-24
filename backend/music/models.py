@@ -44,7 +44,7 @@ class PlaylistMetadata(BaseModel):
 
 
 class PlaylistProposal(PlaylistMetadata):
-    provider: Literal["spotify"] = "spotify"
+    provider: Literal["spotify", "youtube"] = "spotify"
     public: bool = False
     songs: list[RecommendedSong] = Field(min_length=1, max_length=200)
     requested_count: int | None = Field(default=None, ge=1, le=200)

@@ -7,7 +7,7 @@ export type ChatMode = 'agent' | 'rest'
 const CHAT_MODE_STORAGE_KEY = 'playit-chat-mode'
 
 // Block 2: request lifecycle, cancellation, and API errors.
-export function useChat() {
+export function useChat(provider: 'spotify' | 'youtube' = 'spotify') {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,7 +65,7 @@ export function useChat() {
     try {
       if (requestMode === 'agent') {
         update((message) => ({ ...message, progress: ['Playit is considering your request and available actions…'] }))
-        const result = await runPlaylistAgent(prompt, request.signal, history)
+        const result = await runPlaylistAgent(prompt, request.signal, history, provider)
         request.signal.throwIfAborted()
         update((message) => ({
           ...message,
@@ -86,12 +86,13 @@ export function useChat() {
         const action = await getChatIntent(prompt, history, request.signal)
         request.signal.throwIfAborted()
         if (action === 'playlist') {
-          update((message) => ({ ...message, text: 'Finding recommendations and matching them on Spotify…' }))
-          const { preview, contextText } = await preparePlaylist(prompt, request.signal, history)
+          const destination = provider === 'youtube' ? 'YouTube' : 'Spotify'
+          update((message) => ({ ...message, text: `Finding recommendations and matching them on ${destination}…` }))
+          const { preview, contextText } = await preparePlaylist(prompt, request.signal, history, provider)
           request.signal.throwIfAborted()
           update((message) => ({
             ...message,
-            text: 'Here is your playlist preview. Review the matches below before creating it on Spotify.',
+            text: `Here is your playlist preview. Review the matches below before creating it on ${destination}.`,
             status: 'complete',
             contextText,
             playlist: { preview, creating: false, result: preview.result, error: null },
@@ -132,13 +133,13 @@ export function useChat() {
     }
     update({ creating: true, error: null })
     try {
-      update({ result: await approveAndCreatePlaylist(draftId) })
+      update({ result: await approveAndCreatePlaylist(draftId, message.playlist.preview.proposal.provider) })
     } catch (err) {
       update({ error: musicErrorMessage(err) })
       // A failed response does not mean Spotify rejected the write. Read the
       // recorded outcome rather than submitting a fresh draft or retrying writes.
       try {
-        const preview = await getPlaylistPreview(draftId)
+        const preview = await getPlaylistPreview(draftId, message.playlist.preview.proposal.provider)
         update({ result: preview.result })
       } catch { /* Preserve the original error; same-draft retries are server-guarded. */ }
     } finally {

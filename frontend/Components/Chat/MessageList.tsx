@@ -67,22 +67,25 @@ const MessageList = ({ messages, onCreatePlaylist }: {
                 <li key={index}>
                   <strong>{match.track?.title ?? match.recommendation.title}</strong>
                   {' — '}{match.track?.artists.join(', ') ?? match.recommendation.artist}
+                  {match.track && message.playlist.preview.proposal.provider === 'youtube' && ' (uploader)'}
                   <span className="chat-message-note"> · {match.status.replaceAll('_', ' ')}</span>
                 </li>
               ))}</ul>
-              <p className="chat-message-note">The first best match is selected. Unmatched and duplicate suggestions are skipped.</p>
+              <p className="chat-message-note">{message.playlist.preview.proposal.provider === 'youtube'
+                ? 'The first best match is selected when videos tie. Review titles and uploaders carefully; YouTube metadata does not verify recording identity. Unmatched and duplicate videos are skipped.'
+                : 'The first best match is selected. Unmatched and duplicate suggestions are skipped.'}</p>
               {message.playlist.error && <p className="chat-error" role="alert">{message.playlist.error}</p>}
               {message.playlist.result ? (
                 <p role="status">
                   {message.playlist.result.status === 'complete'
                     ? `Playlist created with ${message.playlist.result.added} ${message.playlist.result.added === 1 ? 'track' : 'tracks'}. `
-                    : `Creation needs review (${message.playlist.result.added}/${message.playlist.result.total} confirmed). Check Spotify before making another playlist. `}
-                  {message.playlist.result.url && <a href={message.playlist.result.url} target="_blank" rel="noopener noreferrer">Open in Spotify</a>}
+                    : `Creation needs review (${message.playlist.result.added}/${message.playlist.result.total} confirmed). Check ${message.playlist.preview.proposal.provider === 'youtube' ? 'YouTube' : 'Spotify'} before making another playlist. `}
+                  {message.playlist.result.url && <a href={message.playlist.result.url} target="_blank" rel="noopener noreferrer">Open in {message.playlist.preview.proposal.provider === 'youtube' ? 'YouTube' : 'Spotify'}</a>}
                 </p>
               ) : (
                 <button type="button" disabled={message.playlist.creating || !message.playlist.preview.matched_count || !!message.playlist.preview.constraint_warning}
                   onClick={() => void onCreatePlaylist(message.id)}>
-                  {message.playlist.creating ? 'Creating playlist…' : 'Approve and create on Spotify'}
+                  {message.playlist.creating ? 'Creating playlist…' : `Approve and create on ${message.playlist.preview.proposal.provider === 'youtube' ? 'YouTube' : 'Spotify'}`}
                 </button>
               )}
             </div>

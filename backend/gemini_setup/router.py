@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 import httpx
 from google.genai.errors import APIError
 import json
-from typing import Annotated
+from typing import Annotated, Literal
 from gemini_setup.conversation import ConversationRequest
 from gemini_setup.agent import run_agent
 from spotify.router import access_token
@@ -26,11 +26,11 @@ InteractionRequest = ConversationRequest
 async def run_agent_interaction(
     request: InteractionRequest,
     token: Annotated[str, Depends(access_token)],
+    provider: Literal["spotify", "youtube"] = "spotify",
 ) -> dict[str, str | None]:
     """Run Gemini's bounded tool-calling workflow for the authenticated user."""
     try:
-        print("Running agent interaction with request:", request)
-        return await run_agent(request, token)
+        return await run_agent(request, token, provider)
     except httpx.TimeoutException as exc:
         raise HTTPException(status_code=504, detail="Gemini did not respond before the request timed out.") from exc
     except APIError as exc:

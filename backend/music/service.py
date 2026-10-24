@@ -10,6 +10,7 @@ from fastapi import HTTPException
 
 from music.models import PlaylistPreview, PlaylistProposal, PlaylistResult, SongMatch
 from music.providers import MusicProvider, SpotifyProvider
+from youtube.provider import YouTubeProvider
 
 DRAFT_TTL = 15 * 60
 SESSION_TTL = 50 * 60
@@ -29,7 +30,9 @@ class Draft:
 
 class PlaylistService:
     def __init__(self) -> None:
-        self.providers: dict[str, MusicProvider] = {"spotify": SpotifyProvider()}
+        self.providers: dict[str, MusicProvider] = {
+            "spotify": SpotifyProvider(), "youtube": YouTubeProvider(),
+        }
         self.drafts: dict[str, Draft] = {}
         self.sessions: dict[str, tuple[str, float]] = {}
 
@@ -113,7 +116,8 @@ class PlaylistService:
         duration = sum(track.duration_ms or 0 for track in selected)
         warning = None
         if draft.proposal.requested_count and len(selected) != draft.proposal.requested_count:
-            warning = f"Requested {draft.proposal.requested_count} songs, but only {len(selected)} unique Spotify matches are available. Refine the request before creation."
+            destination = "YouTube" if draft.proposal.provider == "youtube" else "Spotify"
+            warning = f"Requested {draft.proposal.requested_count} songs, but only {len(selected)} unique {destination} matches are available. Refine the request before creation."
         if draft.proposal.target_duration_ms and abs(duration - draft.proposal.target_duration_ms) > 30_000:
             warning = (warning + " " if warning else "") + "Could not match the requested listening time within 30 seconds using verified whole tracks. Refine the request before creation."
         return PlaylistPreview(
@@ -150,8 +154,9 @@ class PlaylistService:
                 playlist_id=playlist_id, url=provider.playlist_url(playlist_id), total=len(tracks),
             )
             try:
-                for start in range(0, len(tracks), 100):
-                    batch = tracks[start:start + 100]
+                batch_size = 1 if draft.proposal.provider == "youtube" else 100
+                for start in range(0, len(tracks), batch_size):
+                    batch = tracks[start:start + batch_size]
                     await provider.add(playlist_id, batch, token)
                     draft.result.added += len(batch)
             except HTTPException:

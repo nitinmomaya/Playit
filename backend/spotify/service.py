@@ -22,7 +22,7 @@ def recommend_songs(request: RecommendationRequest) -> SongRecommendations:
     count, duration = requested_quantity(request)
     candidate_count = count or (min(200, math.ceil(duration / 150_000) + 5) if duration else 5)
     prompt = (
-        f"Recommend exactly {candidate_count} distinct songs that match this request for a Spotify playlist. "
+        f"Recommend exactly {candidate_count} distinct songs that match this request for a music playlist. "
         "Return the complete requested list, not a sample or only additional songs. "
         + (f"The target listening time is {duration / 60_000:g} minutes. These are candidates; "
            "the server will select whole tracks using verified Spotify durations. " if duration else "") +

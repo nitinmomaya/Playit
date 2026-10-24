@@ -2,7 +2,7 @@
 
 import os
 import json
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import HTTPException
 from fastapi.concurrency import run_in_threadpool
@@ -22,7 +22,7 @@ _PLAYLIST_TOOL = types.FunctionDeclaration(
     description=(
         "Prepare a playlist draft when the user explicitly asks for a playlist, "
         "song recommendations, or a refinement of a prior playlist request. "
-        "This only prepares a reviewable draft; it never approves or creates a Spotify playlist."
+        "This only prepares a reviewable draft; it never approves or creates a playlist."
     ),
     parameters_json_schema={"type": "object", "properties": {}, "additionalProperties": False},
 )
@@ -48,13 +48,15 @@ def _conversation_contents(request: ConversationRequest) -> list[types.Content]:
     return contents
 
 
-async def _prepare_playlist(request: ConversationRequest, spotify_token: str) -> tuple[str, str]:
+async def _prepare_playlist(request: ConversationRequest, spotify_token: str,
+                            provider: Literal["spotify", "youtube"] = "spotify") -> tuple[str, str]:
     """Use existing recommendation and draft services; this does not write to Spotify."""
     recommendations: SongRecommendations = await run_in_threadpool(
         recommend_songs,
         RecommendationRequest(prompt=request.prompt, history=request.history),
     )
     proposal = PlaylistProposal.model_validate({
+        "provider": provider,
         "name": recommendations.name,
         "description": recommendations.description,
         "public": False,
@@ -78,7 +80,8 @@ async def _prepare_playlist(request: ConversationRequest, spotify_token: str) ->
     return preview.draft_id, context_text
 
 
-async def run_agent(request: ConversationRequest, spotify_token: str) -> dict[str, str | None]:
+async def run_agent(request: ConversationRequest, spotify_token: str,
+                    provider: Literal["spotify", "youtube"] = "spotify") -> dict[str, str | None]:
     """Let Gemini select the safe preparation tool; keep approval in the Playit UI."""
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -87,7 +90,7 @@ async def run_agent(request: ConversationRequest, spotify_token: str) -> dict[st
     model = os.getenv("GEMINI_PRIMARY_MODEL", "gemini-3.5-flash-lite")
     client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=60_000))
     config = types.GenerateContentConfig(
-        system_instruction=_SYSTEM_INSTRUCTION,
+        system_instruction=_SYSTEM_INSTRUCTION + f" The selected destination is {provider}. Do not change it.",
         tools=[types.Tool(function_declarations=[_PLAYLIST_TOOL])],
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
         max_output_tokens=1024,
@@ -125,7 +128,7 @@ async def run_agent(request: ConversationRequest, spotify_token: str) -> dict[st
                     result = {"error": "A draft has already been prepared for this request."}
                 else:
                     try:
-                        draft_id, context_text = await _prepare_playlist(request, spotify_token)
+                        draft_id, context_text = await _prepare_playlist(request, spotify_token, provider)
                         result = {"status": "awaiting_user_review", "draft_id": draft_id}
                     except HTTPException as exc:
                         result = {"error": str(exc.detail)}

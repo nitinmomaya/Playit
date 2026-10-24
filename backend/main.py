@@ -8,6 +8,7 @@ from login.router import router as login_router
 from spotify.router import router as spotify_router
 from music.router import router as music_router
 from music.mcp_server import mcp, mcp_app
+from youtube.router import router as youtube_router
 
 
 @asynccontextmanager
@@ -42,4 +43,5 @@ app.include_router(spotify_router)
 app.include_router(login_router)
 app.include_router(gemini_router)
 app.include_router(music_router)
+app.include_router(youtube_router)
 app.mount("/mcp", mcp_app)
