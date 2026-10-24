@@ -12,7 +12,7 @@ const Home = () => {
   const provider = authData?.access_token ? 'spotify' : 'youtube'
 
   return (
-    <div className="home-layout">
+    <div className={provider === 'youtube' ? 'home-layout home-layout--youtube' : 'home-layout'}>
       <Navbar />
       <div className="home-body">
         <main className="content-container">

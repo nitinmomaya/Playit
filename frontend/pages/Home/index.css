@@ -7,8 +7,14 @@
     font: inherit;
 }
 
+.home-layout--youtube {
+    --provider-accent: #c9002b;
+    --provider-accent-soft: #fff0f2;
+}
+
 .home-layout > .navbar {
     flex-shrink: 0;
+    padding-inline: max(2rem, calc((100% - 60rem) / 2 + 0.5rem));
 }
 
 .home-body {
@@ -43,4 +49,10 @@
     font-weight: bold;
     margin-top: 2rem;
     color: #1db954;
+}
+
+@media (max-width: 37.5rem) {
+    .welcome-text {
+        font-size: 1.25rem;
+    }
 }

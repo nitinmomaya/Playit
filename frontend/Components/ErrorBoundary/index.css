@@ -13,39 +13,38 @@
 }
 
 .error-boundary__card {
-  width: 100%;
-  max-width: 520px;
+  width: min(100%, 32.5rem);
   padding: clamp(1.5rem, 4vw, 3rem);
   text-align: center;
-  border: 1px solid #dce9e0;
-  border-radius: 24px;
+  border: 0.0625rem solid #dce9e0;
+  border-radius: 1.5rem;
   background: #fff;
-  box-shadow: 0 16px 48px #143b2410;
+  box-shadow: 0 1rem 3rem #143b2410;
 }
 
 .error-boundary__icon {
   display: inline-grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: 3.5rem;
+  height: 3.5rem;
   margin-bottom: 1.5rem;
   border-radius: 50%;
   background: #e8f7ed;
-  color: #167c3d;
+  color: #1db954;
   font-size: 1.75rem;
   font-weight: 700;
 }
 
 .error-boundary__eyebrow {
   margin-bottom: 0.75rem;
-  color: #167c3d;
+  color: #1db954;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 
 .error-boundary h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: 2rem;
   line-height: 1.2;
 }
 
@@ -64,10 +63,10 @@
 }
 
 .error-boundary__actions button {
-  min-height: 44px;
+  min-height: 2.75rem;
   padding: 0.75rem 1.25rem;
-  border: 1px solid #d6e2da;
-  border-radius: 10px;
+  border: 0.0625rem solid #d6e2da;
+  border-radius: 0.625rem;
   background: #fff;
   color: #17251e;
   font: inherit;
@@ -76,8 +75,8 @@
 }
 
 .error-boundary__actions .error-boundary__retry {
-  border-color: #167c3d;
-  background: #167c3d;
+  border-color: #1db954;
+  background: #1db954;
   color: #fff;
 }
 
@@ -87,8 +86,8 @@
 
 .error-boundary button:focus-visible,
 .error-boundary a:focus-visible {
-  outline: 3px solid #1db954;
-  outline-offset: 4px;
+  outline: 0.1875rem solid #1db954;
+  outline-offset: 0.25rem;
 }
 
 .error-boundary__note {
@@ -100,6 +99,17 @@
 .error-boundary__link {
   display: inline-block;
   margin-top: 1.25rem;
-  color: #167c3d;
-  text-underline-offset: 4px;
+  color: #1db954;
+  text-underline-offset: 0.25rem;
+}
+
+@media (max-width: 37.5rem) {
+  .error-boundary h1 {
+    font-size: 1.5rem;
+  }
+
+  .error-boundary__icon {
+    width: 3rem;
+    height: 3rem;
+  }
 }

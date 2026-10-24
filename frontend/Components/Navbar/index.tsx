@@ -15,7 +15,7 @@ const Navbar = () => {
   return (
     <>
      <div className="navbar">
-        <div>Playit</div>
+        <div className="navbar-brand">Playit</div>
       <button className="navbar-logout" type="button" onClick={logout}>Logout</button>
      </div>
     </>
