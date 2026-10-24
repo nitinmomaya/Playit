@@ -7,3 +7,14 @@
   border-bottom: 1px solid #ddd;
   color: #111;
 }
+
+.navbar-logout {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1db954;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+}

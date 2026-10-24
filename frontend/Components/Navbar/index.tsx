@@ -1,7 +1,6 @@
 import { useSpotifyAuthActions } from '../../src/lib/auth'
 import { useYouTubeAuthActions } from '../../src/lib/youtubeAuth'
 import './index.css'
-import Button from '../Button'
 
 const Navbar = () => {
   const { clearAuth } = useSpotifyAuthActions()
@@ -17,7 +16,7 @@ const Navbar = () => {
     <>
      <div className="navbar">
         <div>Playit</div>
-      <Button name="Logout" onClickFunction={logout} />
+      <button className="navbar-logout" type="button" onClick={logout}>Logout</button>
      </div>
     </>
   )

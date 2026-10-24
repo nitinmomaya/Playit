@@ -1,5 +1,12 @@
 .button-primary{
-    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 12px 20px;
     border: none;
     border-radius: 5px;
     background-color: #1db954;
@@ -9,10 +16,31 @@
 }
 
 .button-secondary{
-    padding: 12px;
-    background-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    background-color: #FF0033;
+    border: none;
     border-radius: 5px;
-    color: #121212;
+    color: white;
     cursor: pointer;
     font-size: 16px;
+}
+
+.button-icon{
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+}
+
+.button-icon svg{
+    display: block;
+    width: 100%;
+    height: 100%;
 }

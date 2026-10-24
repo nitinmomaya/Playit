@@ -31,7 +31,7 @@
 }
 
 .chat-mode-picker {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: 0.25rem;
     background: #e8f7ed;
