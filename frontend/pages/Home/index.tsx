@@ -1,5 +1,4 @@
 import Navbar from '../../Components/Navbar'
-import Sidebar from '../../Components/Sidebar'
 import ErrorBoundary from '../../Components/ErrorBoundary'
 import Chat from '../../Components/Chat'
 import { useSpotifyAuth } from '../../src/lib/auth'
