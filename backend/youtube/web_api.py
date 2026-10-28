@@ -3,6 +3,7 @@
 Mirrors spotify/web_api.py without sharing provider credentials or models.
 """
 
+import logging
 import os
 import re
 import ssl
@@ -19,6 +20,7 @@ load_dotenv()
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
+logger = logging.getLogger(__name__)
 
 
 def _ssl_context() -> ssl.SSLContext:
@@ -120,6 +122,11 @@ async def _request_json(
                 for entry in error.get("details", []) or []:
                     if isinstance(entry, dict) and isinstance(entry.get("reason"), str):
                         reasons.add(entry["reason"])
+                logger.warning(
+                    "YouTube API %s failed (HTTP %d, status=%s, reasons=%s)",
+                    url.rsplit("/", 1)[-1], response.status_code,
+                    error.get("status"), sorted(reasons),
+                )
             if reasons & {"accessNotConfigured", "SERVICE_DISABLED"}:
                 detail = "YouTube Data API v3 is disabled in the Google Cloud project owning this OAuth client. Enable it in APIs & Services, then retry."
             elif reasons & {"insufficientPermissions", "ACCESS_TOKEN_SCOPE_INSUFFICIENT"}:

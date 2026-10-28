@@ -1,5 +1,6 @@
 """LangChain owns model configuration, prompts, and structured output only."""
 
+import logging
 import os
 from collections.abc import Sequence
 
@@ -12,6 +13,7 @@ from gemini_setup.conversation import ConversationRequest, contextual_prompt
 from models.song_details_model.songsdetails import SongDetails, SongRecommendations
 
 MAX_MODEL_ATTEMPTS = 3
+logger = logging.getLogger(__name__)
 
 
 class CandidateBatch(BaseModel):
@@ -84,5 +86,6 @@ def generate_candidates(
     except HTTPException:
         raise
     except Exception as exc:
+        logger.warning("Structured recommendations failed (%s): %s", type(exc).__name__, exc)
         raise HTTPException(502, "Could not generate structured recommendations.") from exc
     raise HTTPException(502, "Gemini did not return enough distinct new songs.")
