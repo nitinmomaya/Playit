@@ -9,9 +9,11 @@ import { useChat } from './useChat'
 import './index.css'
 
 // Block 6: compose the UI; this component owns no transport logic.
-const Chat = ({ displayName, provider = 'spotify' }: { displayName: string; provider?: 'spotify' | 'youtube' }) => {
+const Chat = ({ displayName, provider = 'Spotify' }: { displayName: string; provider?: 'Spotify' | 'YouTube' }) => {
+  // Keep display labels separate from the lowercase IDs used by musicApi.
+  const musicProvider = provider === 'YouTube' ? 'youtube' : 'spotify'
   // Prepare { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } for the following operation.
-  const { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } = useChat(provider)
+  const { messages, isSending, error, mode, selectMode, send, createPlaylist, stop } = useChat(musicProvider)
 
   // Return the current operation's result.
   return (
@@ -42,8 +44,7 @@ const Chat = ({ displayName, provider = 'spotify' }: { displayName: string; prov
           </button>
         </div>
       </header>
-      {/* Render the matching state/condition only. */}
-      {provider === 'youtube' && <p>YouTube · Review the matched videos, then approve to create your playlist.</p>}
+      <p>{provider} · Review the matched songs, then approve to create your playlist.</p>
       {/* Render MessageList and handle onCreatePlaylist. */}
       <MessageList messages={messages} onCreatePlaylist={createPlaylist} />
       {/* Render p. */}

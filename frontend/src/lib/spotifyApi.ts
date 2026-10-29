@@ -2,6 +2,7 @@
 import axios, { AxiosHeaders, type RawAxiosRequestHeaders } from 'axios'
 
 // Import auth dependencies.
+import { API_BASE_URL } from './apiConfig'
 import { readSpotifyAuthState, type SpotifyProfile } from './auth'
 
 // Describe the SpotifyTokens data contract.
@@ -38,7 +39,7 @@ export type SpotifyPlaylists = {
 // Configure the backend base URL and JSON transport.
 export const spotifyApi = axios.create({
   // Set the baseURL option/value.
-  baseURL: 'http://127.0.0.1:8000/spotify',
+  baseURL: `${API_BASE_URL}/spotify`,
   // Set the withCredentials option/value.
   withCredentials: true,
   // Set the headers option/value.

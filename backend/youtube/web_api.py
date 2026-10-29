@@ -3,6 +3,7 @@
 Mirrors spotify/web_api.py without sharing provider credentials or models.
 """
 
+import logging
 # Import os.
 import os
 # Import re.
@@ -32,6 +33,7 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 # Set YOUTUBE_API_URL.
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
+logger = logging.getLogger(__name__)
 
 
 # Define _ssl_context.
@@ -196,6 +198,11 @@ async def _request_json(
                         # Call reasons.add.
                         reasons.add(entry["reason"])
             # Check reasons & {'accessNotConfigured', 'SERVICE_DISABLED'}.
+                logger.warning(
+                    "YouTube API %s failed (HTTP %d, status=%s, reasons=%s)",
+                    url.rsplit("/", 1)[-1], response.status_code,
+                    error.get("status"), sorted(reasons),
+                )
             if reasons & {"accessNotConfigured", "SERVICE_DISABLED"}:
                 # Set detail.
                 detail = "YouTube Data API v3 is disabled in the Google Cloud project owning this OAuth client. Enable it in APIs & Services, then retry."

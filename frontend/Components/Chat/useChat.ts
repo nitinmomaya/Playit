@@ -2,9 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 // Import chatApi dependencies.
 import { getChatIntent, streamChatResponse, type ConversationTurn } from '../../src/lib/chatApi'
-// Import musicApi dependencies.
-import { approveAndCreatePlaylist, getPlaylistPreview, musicErrorMessage, preparePlaylist, runPlaylistAgent } from '../../src/lib/musicApi'
-// Import types dependencies.
+import { approveAndCreatePlaylist, getPlaylistPreview, musicErrorMessage, preparePlaylist, runPlaylistAgent, type MusicProvider } from '../../src/lib/musicApi'
 import type { ChatMessage } from './types'
 
 // Describe the ChatMode data contract.
@@ -13,7 +11,7 @@ export type ChatMode = 'agent' | 'rest'
 const CHAT_MODE_STORAGE_KEY = 'playit-chat-mode'
 
 // Block 2: request lifecycle, cancellation, and API errors.
-export function useChat(provider: 'spotify' | 'youtube' = 'spotify') {
+export function useChat(provider: MusicProvider = 'spotify') {
   // Track [messages, setMessages] in component state.
   const [messages, setMessages] = useState<ChatMessage[]>([])
   // Track [isSending, setIsSending] in component state.

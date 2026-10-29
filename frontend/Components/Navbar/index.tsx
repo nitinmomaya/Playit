@@ -4,9 +4,6 @@ import { useSpotifyAuthActions } from '../../src/lib/auth'
 import { useYouTubeAuthActions } from '../../src/lib/youtubeAuth'
 // Import index.css dependencies.
 import './index.css'
-// Import Button dependencies.
-import Button from '../Button'
-
 // Define the Navbar handler/helper.
 const Navbar = () => {
   // Prepare { clearAuth } for the following operation.
@@ -29,10 +26,9 @@ const Navbar = () => {
     <>
      {/* Render div. */}
      <div className="navbar">
-        {/* Render div. */}
-        <div>Playit</div>
-      {/* Render Button and handle onClickFunction. */}
-      <Button name="Logout" onClickFunction={logout} />
+        <div className="navbar-brand">Playit</div>
+  {/* Render the logout action and clear both provider sessions. */}
+  <button className="navbar-logout" type="button" onClick={logout}>Logout</button>
      </div>
     </>
   )

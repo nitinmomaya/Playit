@@ -1,6 +1,7 @@
 // Make JSON requests through Axios.
 import axios, { AxiosHeaders } from 'axios'
 // Import youtubeAuth dependencies.
+import { API_BASE_URL } from './apiConfig'
 import { readYouTubeAuthState, type YouTubeProfile } from './youtubeAuth'
 
 // Describe the YouTubeTokens data contract.
@@ -37,7 +38,7 @@ export type YouTubePage = {
 // Configure the backend base URL and JSON transport.
 export const youtubeApi = axios.create({
   // Set the baseURL option/value.
-  baseURL: 'http://127.0.0.1:8000/youtube',
+  baseURL: `${API_BASE_URL}/youtube`,
   // Set the withCredentials option/value.
   withCredentials: true,
   // Set the headers option/value.

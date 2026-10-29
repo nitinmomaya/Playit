@@ -4,6 +4,41 @@
   align-items: center;
   padding: 1rem;
   background-color: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 0.0625rem solid #ddd;
   color: #111;
+}
+
+.navbar-brand {
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1db954, #c9002b);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.home-layout--youtube .navbar-brand {
+  background-image: linear-gradient(90deg, #c9002b, #1db954);
+}
+
+.navbar-logout {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 0.3125rem;
+  background-color: #1db954;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.home-layout--youtube .navbar-logout {
+  background-color: var(--provider-accent);
+}
+
+@media (max-width: 37.5rem) {
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
 }

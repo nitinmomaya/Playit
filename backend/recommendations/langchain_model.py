@@ -1,5 +1,6 @@
 """LangChain owns model configuration, prompts, and structured output only."""
 
+import logging
 # Import os.
 import os
 # Import Sequence.
@@ -21,6 +22,7 @@ from models.song_details_model.songsdetails import SongDetails, SongRecommendati
 
 # Set MAX_MODEL_ATTEMPTS.
 MAX_MODEL_ATTEMPTS = 3
+logger = logging.getLogger(__name__)
 
 
 # Group the fields/behavior of CandidateBatch.
@@ -121,7 +123,7 @@ def generate_candidates(
         # Propagate this failure instead of continuing.
         raise
     except Exception as exc:
-        # Stop this request with an explicit HTTP error.
+        logger.warning("Structured recommendations failed (%s): %s", type(exc).__name__, exc)
         raise HTTPException(502, "Could not generate structured recommendations.") from exc
     # Stop this request with an explicit HTTP error.
     raise HTTPException(502, "Gemini did not return enough distinct new songs.")
